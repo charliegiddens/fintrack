@@ -1,103 +1,65 @@
+# app.py
 import os
-import json
-from dotenv import load_dotenv
-from flask import Flask, redirect, render_template, session, url_for
-from authlib.integrations.flask_client import OAuth
-from urllib.parse import quote_plus, urlencode
-import requests
+from flask import Flask
+# Removed route-specific imports like session, redirect, url_for, render_template etc.
 
-# Load environment variables from .env file
-load_dotenv()
+# --- Import Extensions, Config, and Blueprints ---
+from extensions import db, oauth # Import db and oauth instances
+from config import Config
+from routes import main_bp # Import the Blueprint from routes.py
 
-# Initialize Flask app
-app = Flask(__name__)
-app.secret_key = os.getenv("APP_SECRET_KEY")
+# --- Application Factory Function ---
+def create_app(config_class=Config):
+    app = Flask(__name__)
+    # --- Load Configuration ---
+    app.config.from_object(config_class)
 
-# Initialize Authlib OAuth client
-oauth = OAuth(app)
+    # --- Initialize Extensions with the app instance ---
+    db.init_app(app)
+    oauth.init_app(app) # Initialize OAuth with the app
 
-# Register Auth0 as an OAuth provider
-oauth.register(
-    "auth0",
-    client_id=os.getenv("AUTH0_CLIENT_ID"),
-    client_secret=os.getenv("AUTH0_CLIENT_SECRET"),
-    client_kwargs={
-        "scope": "openid profile email", # Standard OIDC scopes
-    },
-    server_metadata_url=f'https://{os.getenv("AUTH0_DOMAIN")}/.well-known/openid-configuration'
-)
-
-# Routes
-
-@app.route("/")
-def home():
-    """Render the home page."""
-    # Pass user profile data from session to template if available
-    user_profile = session.get('user')
-    # print(f"User session data: {user_profile}") # Debugging line
-    return render_template(
-        "home.html",
-        session=user_profile,
+    # --- Configure Auth0 OAuth Provider (needs initialized oauth) ---
+    # This registers the 'auth0' client with the oauth object initialized above
+    oauth.register(
+        "auth0",
+        client_id=app.config['AUTH0_CLIENT_ID'], # Use app.config
+        client_secret=app.config['AUTH0_CLIENT_SECRET'], # Use app.config
+        client_kwargs={
+            "scope": "openid profile email",
+        },
+        server_metadata_url=f'https://{app.config["AUTH0_DOMAIN"]}/.well-known/openid-configuration'
     )
 
-@app.route("/login")
-def login():
-    """Redirect users to Auth0 login."""
-    return oauth.auth0.authorize_redirect(
-        redirect_uri=url_for("callback", _external=True)
-    )
+    # --- Register Blueprints ---
+    app.register_blueprint(main_bp)
+    # If you had other blueprints (e.g., for API), register them here:
+    # from routes_api import api_bp
+    # app.register_blueprint(api_bp, url_prefix='/api')
 
-@app.route("/callback", methods=["GET", "POST"])
-def callback():
-    """Handle the callback from Auth0 after login."""
-    try:
-        # Exchange the authorization code for an access token and user info
-        token = oauth.auth0.authorize_access_token()
-        session["user"] = token.get('userinfo') # Store user info in the session
-        # print(f"Callback successful, user info: {session['user']}") # Debugging line
-        return redirect("/dashboard") # Redirect to a protected page
-    except Exception as e:
-        # Handle cases where token exchange fails (e.g., user denied access)
-        print(f"Error during callback: {e}") # Log the error
-        # Optionally flash a message to the user
-        return redirect(url_for("home")) # Redirect home or to an error page
+    # --- Define CLI Commands ---
+    @app.cli.command("init-db")
+    def init_db_command():
+        """Clear existing data and create new tables."""
+        # Update model imports
+        from models import User, Expense # Changed Transaction to Expense
 
-@app.route("/dashboard")
-def dashboard():
-    """A protected route only accessible after login."""
-    user_profile = session.get('user')
-    if not user_profile:
-        # If user is not logged in, redirect to login page
-        return redirect(url_for("login"))
-    # User is logged in, render the dashboard
-    return render_template(
-        "dashboard.html",
-        user=user_profile,
-    )
+        with app.app_context():
+            print("Initializing the database...")
+            # IMPORTANT: If the 'transactions' table exists from before,
+            # db.create_all() will NOT remove it. It will only create 'expenses'.
+            # For development, you might temporarily add db.drop_all()
+            # or manually drop the old table.
+            # db.drop_all() # <--- Add temporarily for clean slate if needed
+            # print("Dropped existing tables.")
+            db.create_all()
+            print("Database initialized! Tables created/checked.")
 
-@app.route("/logout")
-def logout():
-    """Log the user out."""
-    # Clear the Flask session
-    session.clear()
-    # Redirect user to Auth0 logout endpoint
-    domain = os.getenv("AUTH0_DOMAIN")
-    client_id = os.getenv("AUTH0_CLIENT_ID")
-    return_to_url = url_for("home", _external=True) # Where to redirect after logout
+    # Return the configured app instance
+    return app
 
-    logout_url = (
-        f"https://{domain}/v2/logout?"
-        + urlencode(
-            {
-                "returnTo": return_to_url,
-                "client_id": client_id,
-            },
-            quote_via=quote_plus,
-        )
-    )
-    return redirect(logout_url)
-
-# --- Run the App ---
+# --- Run the App (using the factory) ---
 if __name__ == "__main__":
-    # Use port 5000 for local development, matching Auth0 callback URL
-    app.run(host="0.0.0.0", port=5000, debug=True) # debug=True for development
+    flask_app = create_app()
+    # Make sure templates can access session easily (if not already default)
+    # flask_app.jinja_env.globals.update(session=session) # Usually not needed
+    flask_app.run(host="0.0.0.0", port=5000, debug=True)
