@@ -4,11 +4,6 @@
     {# Check the GLOBAL session object for the user key #}
     {% if session.get('user') %}
         <p>You are logged in!</p>
-        {# 'pretty' variable is still available if passed from render_template #}
-        {% if pretty %}
-        <h2>User Profile Data (from Auth0):</h2>
-        <pre>{{ pretty }}</pre>
-        {% endif %}
     {% else %}
         <p>Please <a href="{{ url_for('auth.login') }}">log in</a> to continue.</p>
     {% endif %}

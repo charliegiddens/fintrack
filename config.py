@@ -10,6 +10,7 @@ class Config:
     """Base configuration variables."""
     SECRET_KEY = os.environ.get('APP_SECRET_KEY')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    TESTING = False # Base config is not for testing
 
     # Load DB components from environment
     DB_USER = os.environ.get('DB_USER')
@@ -29,32 +30,38 @@ class Config:
         print(f"DB_DRIVER: {'Set' if DB_DRIVER else 'MISSING'}")
         raise ValueError("Missing one or more core database environment variables")
 
-    # URL-encode password
-    DB_PASSWORD_ENCODED = quote_plus(DB_PASSWORD_RAW)
-
-    query_params = {
-        'driver': DB_DRIVER,
-        'Encrypt': 'yes',
-        'TrustServerCertificate': 'no',
-    }
-    # Encode the parameters into a query string (e.g., driver=...&Encrypt=yes...)
-    query_string = urlencode(query_params)
-
-    SQLALCHEMY_DATABASE_URI = (
-        f"mssql+pyodbc://{DB_USER}:{DB_PASSWORD_ENCODED}@{DB_SERVER}:{DB_PORT}/"
-        f"{DB_DATABASE}?{query_string}"
-    )
-
-    # --- Debug Print ---
-    print("--- DEBUG (DSN Params in URL Query) ---")
-    print(f"SQLALCHEMY_DATABASE_URI (Password Hidden): mssql+pyodbc://{DB_USER}:<PASSWORD_HIDDEN>@{DB_SERVER}:{DB_PORT}/{DB_DATABASE}?{query_string}")
-    print(f"Actual URI is set: {bool(SQLALCHEMY_DATABASE_URI)}")
-    print("--- END DEBUG ---")
+    # Construct DB URI only if not testing (and if all vars are present)
+    SQLALCHEMY_DATABASE_URI = None
+    if DB_USER and DB_PASSWORD_RAW and DB_SERVER and DB_DATABASE and DB_DRIVER:
+        DB_PASSWORD_ENCODED = quote_plus(DB_PASSWORD_RAW)
+        query_params = {'driver': DB_DRIVER, 'Encrypt': 'yes', 'TrustServerCertificate': 'no'}
+        query_string = urlencode(query_params)
+        SQLALCHEMY_DATABASE_URI = (
+            f"mssql+pyodbc://{DB_USER}:{DB_PASSWORD_ENCODED}@{DB_SERVER}:{DB_PORT}/"
+            f"{DB_DATABASE}?{query_string}"
+        )
+    elif not TESTING:
+        print("Warning: Standard DB environment variables not fully set.")
 
     # --- Auth0 Config ---
     AUTH0_CLIENT_ID = os.environ.get('AUTH0_CLIENT_ID')
     AUTH0_CLIENT_SECRET = os.environ.get('AUTH0_CLIENT_SECRET')
     AUTH0_DOMAIN = os.environ.get('AUTH0_DOMAIN')
 
-    if not all([AUTH0_CLIENT_ID, AUTH0_CLIENT_SECRET, AUTH0_DOMAIN]):
-        raise ValueError("Missing one or more Auth0 environment variables")
+    if not TESTING and not all([AUTH0_CLIENT_ID, AUTH0_CLIENT_SECRET, AUTH0_DOMAIN]):
+        print("Warning: Auth0 environment variables not fully set.")
+
+class TestingConfig(Config):
+    """Testing-specific configuration."""
+    TESTING = True
+    # in-memory SQLite database for tests
+    SQLALCHEMY_DATABASE_URI = "sqlite:///:memory:"
+
+    # Define serrver name for testing exteral url gen
+    SERVER_NAME = "localhost"
+
+    SECRET_KEY = 'test_secretkey' # Simple key adequate for tests
+    # Dummy Auth0 values for testing config (mocks will bypass actual use)
+    AUTH0_DOMAIN = 'testing.auth0.com'
+    AUTH0_CLIENT_ID = 'test_client_id'
+    AUTH0_CLIENT_SECRET = 'test_client_secret'

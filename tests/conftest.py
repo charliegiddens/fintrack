@@ -1,7 +1,7 @@
 import pytest
-from app import create_app # Your app factory
-from config import TestingConfig # Your testing config class
-from extensions import db as _db # Your database extension instance
+from app import create_app
+from config import TestingConfig
+from extensions import db as _db
 
 # --- Core Fixtures ---
 
@@ -56,8 +56,7 @@ def db(app):
     yield _db # Provide the db instance to tests using it
 
     # Explicitly close connections after tests are done
-    _db.session.close_all()
-    # _db.engine.dispose() # May be needed in some scenarios
+    _db.engine.dispose()
 
     with app.app_context():
         print("\n--- Dropping Test Database Tables (Session Scope) ---")
@@ -66,25 +65,24 @@ def db(app):
 @pytest.fixture(scope='function')
 def session(db):
     """
-    Manages DB transactions for each test function.
-    Starts a transaction, yields the session, and rolls back afterwards.
-    Ensures test isolation.
+    Ensures test isolation by running each test within a database transaction
+    that is rolled back afterwards. Makes the app's db.session use this transaction.
     """
+    # Obtain a connection from the engine managed by the db fixture
     connection = db.engine.connect()
+    # Begin a transaction
     transaction = connection.begin()
 
-    # Use the connection for the session object provided to the test
-    options = dict(bind=connection, binds={})
-    sess = db.create_scoped_session(options=options)
+    # Bind the application's scoped session to this transaction/connection.
+    # All db.session operations within the test will now use this transaction.
+    db.session.configure(bind=connection)
 
-    # Overwrite the default session object with this transaction-bound session
-    db.session = sess
-    # print("\n--- Started DB Transaction (Function Scope) ---") # Debug
+    yield db.session # Yield the application's db.session proxy
 
-    yield sess # This is the session object tests should use for DB operations
-
-    # Teardown: rollback transaction and close connection
-    sess.remove()
+    # Teardown: Rollback the transaction and close the connection
+    # print("\n--- Rolling Back Test Transaction (Function Scope) ---") # Debug
+    db.session.remove() # Crucial: remove the scoped session context
     transaction.rollback()
     connection.close()
-    # print("\n--- Rolled Back DB Transaction (Function Scope) ---") # Debug
+    # Reset the session binding after the test (optional but cleaner)
+    db.session.configure(bind=db.engine)
