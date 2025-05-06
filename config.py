@@ -1,4 +1,3 @@
-# config.py
 import os
 from dotenv import load_dotenv
 from urllib.parse import quote_plus, urlencode
@@ -11,6 +10,9 @@ class Config:
     SECRET_KEY = os.environ.get('APP_SECRET_KEY')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     TESTING = False # Base config is not for testing
+
+    # flask cli authentication key
+    CLI_KEY = os.environ.get('CLI_KEY')
 
     # Load DB components from environment
     DB_USER = os.environ.get('DB_USER')
@@ -57,7 +59,7 @@ class TestingConfig(Config):
     # in-memory SQLite database for tests
     SQLALCHEMY_DATABASE_URI = "sqlite:///:memory:"
 
-    # Define serrver name for testing exteral url gen
+    # Define server name for testing exteral url gen
     SERVER_NAME = "localhost"
 
     SECRET_KEY = 'test_secretkey' # Simple key adequate for tests
