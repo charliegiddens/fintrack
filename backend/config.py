@@ -49,8 +49,24 @@ class Config:
     AUTH0_CLIENT_ID = os.environ.get('AUTH0_CLIENT_ID')
     AUTH0_CLIENT_SECRET = os.environ.get('AUTH0_CLIENT_SECRET')
     AUTH0_DOMAIN = os.environ.get('AUTH0_DOMAIN')
+    AUTH0_API_AUDIENCE = os.environ.get('AUTH0_API_AUDIENCE')
 
-    if not TESTING and not all([AUTH0_CLIENT_ID, AUTH0_CLIENT_SECRET, AUTH0_DOMAIN]):
+    # --- Redis Config ---
+    CACHE_TYPE = os.environ.get('CACHE_TYPE', 'RedisCache')
+    CACHE_REDIS_HOST = os.environ.get('CACHE_REDIS_HOST')
+    CACHE_REDIS_PORT = int(os.environ.get('CACHE_REDIS_PORT'))
+    CACHE_REDIS_PASSWORD = os.environ.get('CACHE_REDIS_PASSWORD')
+    CACHE_REDIS_DB = int(os.environ.get('CACHE_REDIS_DB', 0))
+    CACHE_DEFAULT_TIMEOUT = int(os.environ.get('CACHE_DEFAULT_TIMEOUT', 300))
+    CACHE_REDIS_URI = None
+    if CACHE_REDIS_HOST and CACHE_REDIS_PORT and CACHE_REDIS_PASSWORD and CACHE_REDIS_DB:
+        CACHE_REDIS_PASSWORD_ENCODED = quote_plus(CACHE_REDIS_PASSWORD)
+        CACHE_REDIS_URI = (
+            f"rediss://:{CACHE_REDIS_PASSWORD_ENCODED}@{CACHE_REDIS_HOST}:{CACHE_REDIS_PORT}/{CACHE_REDIS_DB}"
+        )
+
+
+    if not TESTING and not all([AUTH0_CLIENT_ID, AUTH0_CLIENT_SECRET, AUTH0_DOMAIN, AUTH0_API_AUDIENCE]):
         print("Warning: Auth0 environment variables not fully set.")
 
 class TestingConfig(Config):
@@ -61,6 +77,9 @@ class TestingConfig(Config):
 
     # Define server name for testing exteral url gen
     SERVER_NAME = "localhost"
+
+    # Caching for tests
+    CACHE_TYPE = 'SimpleCache' # Use simplecache so tests dont need our external redis instance
 
     SECRET_KEY = 'test_secretkey' # Simple key adequate for tests
     # Dummy Auth0 values for testing config (mocks will bypass actual use)

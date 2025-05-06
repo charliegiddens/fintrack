@@ -3,7 +3,7 @@ from flask import Flask
 import click
 
 # import extensions
-from extensions import db, oauth
+from extensions import db, oauth, cache
 from config import Config
 
 # import route blueprints
@@ -18,6 +18,7 @@ def create_app(config_class=Config):
     # initialise extensions
     db.init_app(app)
     oauth.init_app(app)
+    cache.init_app(app) 
 
     # Auth0 config
     oauth.register(
