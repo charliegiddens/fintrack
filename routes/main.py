@@ -1,6 +1,5 @@
 import json
 from flask import Blueprint, render_template, session, redirect, url_for, flash
-from models import User # Assuming you might need User details later
 
 # Define the Blueprint for main pages
 main_bp = Blueprint(
