@@ -1,22 +1,20 @@
-# decorators.py
 import jwt
 import requests
 from functools import wraps
 from flask import request, jsonify, current_app
 
 from models import User
-from extensions import db, cache # <-- Import cache from extensions
+from extensions import db, cache
 
-# --- AuthError class (remains the same) ---
 class AuthError(Exception):
     def __init__(self, error_payload, status_code):
         super().__init__(error_payload.get("description", "Authentication Error"))
         self.error_payload = error_payload
         self.status_code = status_code
 
-# --- JWKS Caching Configuration ---
-JWKS_CACHE_KEY = 'auth0_jwks_keys_v1' # Use a versioned key if structure might change
-JWKS_CACHE_TIMEOUT = 3600 * 24 # Cache JWKS for 24 hours (adjust as needed)
+# JWKS Caching Configuration
+JWKS_CACHE_KEY = 'auth0_jwks_keys_v1'
+JWKS_CACHE_TIMEOUT = 3600 * 24 # 24h
 
 def get_jwks():
     """
@@ -62,9 +60,7 @@ def get_jwks():
         current_app.logger.error(f"Failed to decode JWKS JSON: {e}")
         raise AuthError({"code": "jwks_decode_error", "description": "Unable to parse public key information."}, 500)
 
-# --- get_signing_key function (remains the same, calls the new get_jwks) ---
 def get_signing_key(token):
-    # ... (same implementation as before, it will use the new get_jwks()) ...
     try:
         unverified_header = jwt.get_unverified_header(token)
     except jwt.PyJWTError as e:
@@ -91,13 +87,6 @@ def get_signing_key(token):
 
     if not rsa_key_dict:
         current_app.logger.warning(f"RSA signing key with KID {kid} not found in JWKS.")
-        # If key rotation happens, the cache might be stale.
-        # For an immediate retry after a key is not found:
-        # current_app.logger.info(f"Attempting to refresh JWKS due to missing KID {kid}.")
-        # cache.delete(JWKS_CACHE_KEY) # Clear cache
-        # jwks_keys = get_jwks() # Retry fetch
-        # ... (re-run find logic, but be careful of infinite loops) ...
-        # A simpler approach is just to let the cache expire naturally.
         raise AuthError({"code": "signing_key_not_found", "description": "Unable to find appropriate signing key for token."}, 401)
 
     try:
@@ -106,10 +95,7 @@ def get_signing_key(token):
         current_app.logger.error(f"Could not construct RSA signing key from JWK: {e}")
         raise AuthError({"code": "key_construction_error", "description": "Error processing signing key."}, 500)
 
-
-# --- token_required decorator (remains the same, calls the new get_signing_key) ---
 def token_required(f):
-    # ... (same implementation as before) ...
     @wraps(f)
     def decorated_function(*args, **kwargs):
         auth_header = request.headers.get('Authorization', None)
