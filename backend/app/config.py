@@ -1,18 +1,21 @@
 import os
 from dotenv import load_dotenv
 from urllib.parse import quote_plus, urlencode
+import ssl
 
-# Load environment variables from .env file into the environment
 load_dotenv()
 
 class Config:
     """Base configuration variables."""
     SECRET_KEY = os.environ.get('APP_SECRET_KEY')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    TESTING = False # Base config is not for testing
+    TESTING = False
 
     # flask cli authentication key
     CLI_KEY = os.environ.get('CLI_KEY')
+
+    # CORS
+    FRONTEND_ORIGIN = os.environ.get('FRONTEND_ORIGIN')
 
     # Load DB components from environment
     DB_USER = os.environ.get('DB_USER')
@@ -52,18 +55,10 @@ class Config:
     AUTH0_API_AUDIENCE = os.environ.get('AUTH0_API_AUDIENCE')
 
     # --- Redis Config ---
-    CACHE_TYPE = os.environ.get('CACHE_TYPE', 'RedisCache')
-    CACHE_REDIS_HOST = os.environ.get('CACHE_REDIS_HOST')
-    CACHE_REDIS_PORT = int(os.environ.get('CACHE_REDIS_PORT'))
-    CACHE_REDIS_PASSWORD = os.environ.get('CACHE_REDIS_PASSWORD')
-    CACHE_REDIS_DB = int(os.environ.get('CACHE_REDIS_DB', 0))
-    CACHE_DEFAULT_TIMEOUT = int(os.environ.get('CACHE_DEFAULT_TIMEOUT', 300))
-    CACHE_REDIS_URI = None
-    if CACHE_REDIS_HOST and CACHE_REDIS_PORT and CACHE_REDIS_PASSWORD and CACHE_REDIS_DB:
-        CACHE_REDIS_PASSWORD_ENCODED = quote_plus(CACHE_REDIS_PASSWORD)
-        CACHE_REDIS_URI = (
-            f"rediss://:{CACHE_REDIS_PASSWORD_ENCODED}@{CACHE_REDIS_HOST}:{CACHE_REDIS_PORT}/{CACHE_REDIS_DB}"
-        )
+    CACHE_TYPE = "redis"
+    CACHE_DEFAULT_TIMEOUT = os.getenv("CACHE_DEFAULT_TIMEOUT")
+    CACHE_REDIS_URL = os.getenv("AZURE_REDIS_URL")
+    ALGORITHMS = os.getenv("CACHE_ALGORITHMS")
 
 
     if not TESTING and not all([AUTH0_CLIENT_ID, AUTH0_CLIENT_SECRET, AUTH0_DOMAIN, AUTH0_API_AUDIENCE]):

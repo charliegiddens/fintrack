@@ -1,3 +1,4 @@
+/* frontend/src/index.css */
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
@@ -5,9 +6,57 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background-color: #f4f7f6;
+  color: #333;
 }
 
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
+}
+
+button {
+  padding: 8px 15px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1em;
+  margin: 5px;
+}
+
+.auth-button {
+  background-color: #007bff;
+  color: white;
+}
+.auth-button:hover {
+  background-color: #0056b3;
+}
+
+.page-loading, .app-loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 80vh;
+  font-size: 1.2em;
+}
+
+.page-container {
+  padding: 20px;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.error-message {
+  color: red;
+  padding: 10px;
+  border: 1px solid red;
+  background-color: #ffebee;
+  border-radius: 4px;
+}
+
+pre {
+  background-color: #eee;
+  padding: 15px;
+  border-radius: 5px;
+  overflow-x: auto; /* For long lines in JSON */
 }

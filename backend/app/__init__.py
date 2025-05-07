@@ -1,14 +1,15 @@
 import os
-from flask import Flask
+from flask import Flask, jsonify
+from flask_cors import CORS
 import click
+from .auth_utils import AuthError
 
 # import extensions
-from extensions import db, oauth, cache
-from config import Config
+from .extensions import db, cache
+from .config import Config
 
-# import route blueprints
-from routes.main import main_bp # main blueprint
-from routes.auth import auth_bp # auth blueprint
+# import blueprints
+from routes.api_routes import api_bp
 
 # application factory func
 def create_app(config_class=Config):
@@ -17,21 +18,40 @@ def create_app(config_class=Config):
 
     # initialise extensions
     db.init_app(app)
-    oauth.init_app(app)
     cache.init_app(app) 
 
-    # Auth0 config
-    oauth.register(
-        "auth0",
-        client_id=app.config['AUTH0_CLIENT_ID'],
-        client_secret=app.config['AUTH0_CLIENT_SECRET'],
-        client_kwargs={"scope": "openid profile email",},
-        server_metadata_url=f'https://{app.config["AUTH0_DOMAIN"]}/.well-known/openid-configuration'
+    # CORS
+    CORS(
+        app,
+        resources={
+            r"/api/*": {
+                "origins": [
+                    app.config['FRONTEND_ORIGIN']
+                    # add prod frontend env later
+                ],
+                "supports_credentials": True
+            }
+        }
     )
 
+
     # blueprint registration
-    app.register_blueprint(main_bp)
-    app.register_blueprint(auth_bp, url_prefix="/auth")
+    app.register_blueprint(api_bp, url_prefix='/api')
+
+    # Register global error handlers
+    @app.errorhandler(AuthError)
+    def handle_auth_error(ex):
+        response = jsonify(ex.error)
+        response.status_code = ex.status_code
+        return response
+
+    @app.errorhandler(404)
+    def page_not_found(e):
+        return jsonify(error=404, text=str(e)), 404
+        
+    @app.route("/health")
+    def health_check():
+        return jsonify(status="healthy", cache_type=app.config.get("CACHE_TYPE"))
 
     # flask cli commands
     @app.cli.command("init-db")
@@ -41,7 +61,6 @@ def create_app(config_class=Config):
 
         with app.app_context():
             print("Initializing the database...")
-            # db.drop_all() # Optional for dev reset
             db.create_all()
             print("Database initialized!")
     
