@@ -1,4 +1,3 @@
-import os
 from flask import Flask, jsonify
 from flask_cors import CORS
 import click
@@ -59,7 +58,6 @@ def create_app(config_class=Config):
     @app.cli.command("init-db")
     def init_db_command():
         """Clear existing data and create new tables."""
-        from models import User, Expense # Import models needed for database initialisation
 
         with app.app_context():
             print("Initializing the database...")
@@ -69,7 +67,7 @@ def create_app(config_class=Config):
     @app.cli.command("drop-db")
     def drop_db_command():
         """Drop all tables."""
-        if click.confirm("This command will drop the WHOLE database. Are you absolutely sure you want to do this?"):
+        if click.confirm("This will drop the WHOLE database. Are you sure you want to do this?"):
             if click.prompt('Input the CLI authentication key') == app.config['CLI_KEY']:
                 with app.app_context():
                     print("Dropping the database...")

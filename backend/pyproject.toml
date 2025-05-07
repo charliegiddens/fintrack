@@ -1,0 +1,4 @@
+[tool.ruff]
+line-length = 125
+select = ["E", "F"]
+exclude = ["migrations", "__pycache__"]

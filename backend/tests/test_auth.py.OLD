@@ -1,8 +1,6 @@
-import pytest
-import pytest_mock
-from flask import url_for, session as flask_session, redirect
+from flask import url_for, redirect
 from models import User
-from extensions import oauth
+from app.extensions import oauth
 
 def test_login_redirects_to_auth0(client, mocker):
     """Test that /login route calls Auth0's authorize_redirect."""

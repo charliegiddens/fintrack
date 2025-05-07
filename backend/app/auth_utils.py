@@ -1,7 +1,7 @@
 import requests
 import json
 from functools import wraps
-from flask import request, current_app, jsonify, g
+from flask import request, current_app, g
 import jwt
 from jwt.algorithms import RSAAlgorithm
 
@@ -31,7 +31,7 @@ def get_jwks_from_auth0_uncached():
         raise AuthError({"code": "config_error",
                          "description": "Authentication service domain not configured."}, 500)
 
-    current_app.logger.info(f"Fetching JWKS from Auth0 (https://{auth0_domain}/.well-known/jwks.json) (not from cache)...")
+    current_app.logger.info(f"Fetching JWKS from Auth0 (https://{auth0_domain}/.well-known/jwks.json)")
     try:
         jwks_url = f"https://{auth0_domain}/.well-known/jwks.json"
         jwks_response = requests.get(jwks_url, timeout=10)

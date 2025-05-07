@@ -1,7 +1,6 @@
 import os
 from dotenv import load_dotenv
 from urllib.parse import quote_plus, urlencode
-import ssl
 
 load_dotenv()
 

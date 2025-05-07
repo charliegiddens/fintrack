@@ -1,7 +1,7 @@
 import pytest
 from app import create_app
-from config import TestingConfig
-from extensions import db as _db
+from app.config import TestingConfig
+from app.extensions import db as _db
 
 # --- Core Fixtures ---
 

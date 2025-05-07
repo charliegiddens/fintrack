@@ -1,5 +1,5 @@
-from flask import Blueprint, jsonify, current_app, g, request
-from app.auth_utils import requires_auth, AuthError
+from flask import Blueprint, jsonify, g, request
+from app.auth_utils import requires_auth
 from models.expense import Expense
 from app.api_helpers import get_internal_user_id_from_auth0_sub
 from decimal import Decimal
