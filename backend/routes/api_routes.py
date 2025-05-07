@@ -1,5 +1,6 @@
 from flask import Blueprint, jsonify, current_app, g
 from app.auth_utils import requires_auth, clear_jwks_cache_util, AuthError
+from app.api_helpers import get_internal_user_id_from_auth0_sub
 
 api_bp = Blueprint('api', __name__)
 
@@ -12,8 +13,10 @@ def public_endpoint():
 def private_endpoint():
     if hasattr(g, 'current_user'):
         user_payload = g.current_user
-        user_id = user_payload.get("sub")
-        return jsonify(message=f"Hello from a private endpoint! You are authenticated. User ID: {user_id}")
+        auth0_subject_id = user_payload.get("sub")
+        local_user_id = get_internal_user_id_from_auth0_sub(auth0_subject_id)
+
+        return jsonify(message=f"You are authenticated. Auth0 User ID: {auth0_subject_id} | Fintrack User ID: {local_user_id}")
 
 # Commenting this code out ready for when we start adding scoped endpoints
 

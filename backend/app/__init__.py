@@ -10,6 +10,7 @@ from .config import Config
 
 # import blueprints
 from routes.api_routes import api_bp
+from routes.expense_routes import expense_bp
 
 # application factory func
 def create_app(config_class=Config):
@@ -37,6 +38,7 @@ def create_app(config_class=Config):
 
     # blueprint registration
     app.register_blueprint(api_bp, url_prefix='/api')
+    app.register_blueprint(expense_bp, url_prefix='/api/expenses')
 
     # Register global error handlers
     @app.errorhandler(AuthError)

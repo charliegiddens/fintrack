@@ -4,6 +4,7 @@ import { useAuth0 } from '@auth0/auth0-react';
 
 import HomePage from './pages/HomePage';
 import DashboardPage from './pages/DashboardPage';
+import ExpensesPage from './pages/ExpensesPage';
 
 import LoginButton from './components/LoginButton';
 import LogoutButton from './components/LogoutButton';
@@ -30,11 +31,9 @@ function App() {
           {isAuthenticated && (
             <Link to="/dashboard" className="nav-link">Dashboard</Link>
           )}
-          {/* Example for later:
           {isAuthenticated && (
             <Link to="/expenses" className="nav-link">Expenses</Link>
           )}
-          */}
           <div className="auth-buttons">
             {!isAuthenticated ? <LoginButton /> : <LogoutButton />}
           </div>
@@ -47,12 +46,10 @@ function App() {
               path="/dashboard"
               element={<ProtectedRoute component={DashboardPage} />}
             />
-            {/* Example for later:
             <Route
               path="/expenses"
               element={<ProtectedRoute component={ExpensesPage} />}
             />
-            */}
           </Routes>
         </main>
       </div>

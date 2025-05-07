@@ -52,25 +52,26 @@ function DashboardPage() {
 
     return (
         <div className="page-container dashboard-page">
-        <h2>Dashboard</h2>
-        <p>Welcome back, {user?.name || user?.nickname || user?.email}!</p>
+            <h2>Dashboard</h2>
+            <p>Welcome back, {user?.name || user?.nickname || user?.email}!</p>
 
-        <div className="profile-info">
-            <h3>Your Auth0 Profile:</h3>
-            <pre>{JSON.stringify(user, null, 2)}</pre>
-        </div>
+            <div className="profile-info">
+                <h3>Your Auth0 Profile:</h3>
+                <pre>{JSON.stringify(user, null, 2)}</pre>
+            </div>
 
-        <div className="api-data-section">
-            <h3>Data from Secure API Endpoint (/api/profile):</h3>
-            {apiLoading && <p>Loading data from API...</p>}
-            {apiError && <p className="error-message">API Error: {apiError}</p>}
-            {apiData && (
-            <pre>{JSON.stringify(apiData, null, 2)}</pre>
-            )}
-            {!apiLoading && !apiError && !apiData && (
-            <p>No data loaded from the API, or the endpoint might not be set up yet.</p>
-            )}
-        </div>
+            <div className="api-data-section">
+                <h3>Data from Secure API Endpoint (/api/profile):</h3>
+                {apiLoading && <p>Loading data from API...</p>}
+                {apiError && <p className="error-message">API Error: {apiError}</p>}
+                {apiData && (
+                <pre>{JSON.stringify(apiData, null, 2)}</pre>
+                )}
+                {!apiLoading && !apiError && !apiData && (
+                <p>No data loaded from the API, or the endpoint might not be set up yet.</p>
+                )}
+            </div>
+            
         </div>
     );
 }
