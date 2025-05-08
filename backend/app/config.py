@@ -17,11 +17,11 @@ class Config:
     FRONTEND_ORIGIN = os.environ.get('FRONTEND_ORIGIN')
 
     # Load DB components from environment
-    DB_USER = os.environ.get('DB_USER')
-    DB_PASSWORD_RAW = os.environ.get('DB_PASSWORD')
-    DB_SERVER = os.environ.get('DB_SERVER')
+    DB_USER = os.environ.get('DB_USER', 'user')
+    DB_PASSWORD_RAW = os.environ.get('DB_PASSWORD', 'password')
+    DB_SERVER = os.environ.get('DB_SERVER', 'url')
     DB_PORT = os.environ.get('DB_PORT', '1433')
-    DB_DATABASE = os.environ.get('DB_DATABASE')
+    DB_DATABASE = os.environ.get('DB_DATABASE', 'database')
     DB_DRIVER = os.environ.get('DB_DRIVER', 'ODBC Driver 18 for SQL Server')
 
     # Check all DB env variables are declared.
@@ -67,14 +67,6 @@ class TestingConfig(Config):
     """Testing-specific configuration."""
     TESTING = True
     DEBUG = True
-
-    # avoid pipeline errors
-    DB_USER = os.environ.get('DB_USER', 'test_user')
-    DB_PASSWORD_RAW = os.environ.get('DB_PASSWORD', 'test_password')
-    DB_SERVER = os.environ.get('DB_SERVER', 'test_server')
-    DB_PORT = os.environ.get('DB_PORT', '1433')
-    DB_DATABASE = os.environ.get('DB_DATABASE', 'test_db')
-    DB_DRIVER = os.environ.get('DB_DRIVER', 'ODBC Driver 18 for SQL Server')
 
     # in-memory SQLite database for tests
     SQLALCHEMY_DATABASE_URI = "sqlite:///:memory:"
