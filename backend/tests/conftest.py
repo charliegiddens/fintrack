@@ -54,6 +54,7 @@ def client(app): # Remains useful for route tests later
 
 # --- Auth Mocking Fixtures ---
 MOCK_AUTH0_SUBJECT_ID = "auth0|testuser123"
+MOCK_AUTH0_EMAIL = "test@example.com"
 MOCK_FINTRACK_USER_ID = 1
 
 #
@@ -79,7 +80,7 @@ def mock_verify_decode_jwt(mocker):
 @pytest.fixture
 def seed_test_user(db):
     from models.user import User # Local import to avoid circular dependency issues at load time
-    user = User(id=MOCK_FINTRACK_USER_ID, auth0_subject=MOCK_AUTH0_SUBJECT_ID, email="test@example.com")
+    user = User(id=MOCK_FINTRACK_USER_ID, auth0_subject=MOCK_AUTH0_SUBJECT_ID, email=MOCK_AUTH0_EMAIL)
     db.session.add(user)
     db.session.commit()
     return user

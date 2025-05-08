@@ -1,7 +1,7 @@
 from flask import Blueprint, jsonify, g, request
 from app.auth_utils import requires_auth
 from models.expense import Expense
-from app.api_helpers import get_internal_user_id_from_auth0_sub
+from app.api_helpers import get_internal_user_id_from_auth0_sub, create_internal_user_from_auth0_sub
 from decimal import Decimal
 import datetime
 from datetime import timezone
@@ -14,6 +14,10 @@ expense_bp = Blueprint('expenses', __name__)
 def create_expense():
     auth0_subject_id = g.current_user.get("sub")
     fintrack_user_id = get_internal_user_id_from_auth0_sub(auth0_subject_id)
+
+    if not fintrack_user_id:
+        # Create a new user from Auth0 subject if not found
+        fintrack_user_id = create_internal_user_from_auth0_sub(auth0_subject_id, g.current_user.get("email"))
 
     if not fintrack_user_id:
         return jsonify({"error": "Authenticated user not found in local database."}), 404
@@ -81,16 +85,20 @@ def get_expense_by_id(expense_id): # expense_id is now a path parameter
     fintrack_user_id = get_internal_user_id_from_auth0_sub(auth0_subject_id)
 
     if not fintrack_user_id:
-        # This case might be rare if @requires_auth implies a linked local user,
-        # but good to have for robustness if JIT provisioning isn't immediate.
+        # Create a new user from Auth0 subject if not found
+        fintrack_user_id = create_internal_user_from_auth0_sub(auth0_subject_id, g.current_user.get("email"))
+
+    if not fintrack_user_id:
         return jsonify({"error": "Authenticated user not found in local database."}), 404
 
     # --- Query for the specific expense belonging to the user ---
     # We filter by both expense_id AND user_id for security.
-    expense = Expense.query.filter_by(id=expense_id, user_id=fintrack_user_id).first()
+    expense = Expense.query.filter_by(id=expense_id).first()
 
-    if not expense:
-        # Expense not found OR it doesn't belong to the authenticated user
-        return jsonify({"error": "Expense not found or access denied."}), 404
-
-    return jsonify(expense.to_dict()), 200
+    if expense:
+        if ( expense.to_dict()["user_id"] == fintrack_user_id ):
+            return jsonify(expense.to_dict()), 200
+        else:
+            return jsonify({"error": "Access denied."}), 401
+    elif not expense:
+        return jsonify({"error": "Expense not found."}), 404

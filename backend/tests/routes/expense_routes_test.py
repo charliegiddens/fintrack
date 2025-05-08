@@ -62,6 +62,7 @@ def test_create_expense_invalid_category(client):
 
 @pytest.mark.usefixtures("seed_test_user")
 def test_create_expense_user_not_found(client, mocker):
+    mocker.patch("routes.expense_routes.create_internal_user_from_auth0_sub", return_value=None) # We also need to mock user creation to avoid creating this user
     mocker.patch('routes.expense_routes.get_internal_user_id_from_auth0_sub', return_value=None)
     
     response = client.post('/create', json={
@@ -125,12 +126,13 @@ def test_get_expense_by_id_wrong_user(client, mocker, db, seed_test_user):
     mocker.patch('routes.expense_routes.get_internal_user_id_from_auth0_sub', return_value=1)
 
     response = client.get(f"/get_by_id/{expense.id}")
-    assert response.status_code == 404
+    assert response.status_code == 401
     response_data = response.get_json()
-    assert response_data == {"error": "Expense not found or access denied."}
+    assert response_data == {"error": "Access denied."}
 
 @pytest.mark.usefixtures("seed_test_user")
 def test_get_expense_user_not_found(client, mocker):
-    mocker.patch("app.api_helpers.get_internal_user_id_from_auth0_sub", return_value=None)
+    mocker.patch("routes.expense_routes.create_internal_user_from_auth0_sub", return_value=None) # We also need to mock user creation to avoid creating this user
+    mocker.patch("routes.expense_routes.get_internal_user_id_from_auth0_sub", return_value=None)
     response = client.get("/get_by_id/1")
     assert response.status_code == 404
