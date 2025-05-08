@@ -8,6 +8,7 @@ from sqlalchemy.engine import Engine
 
 from app.config import TestingConfig
 from app.extensions import db as _db
+from routes.expense_routes import expense_bp
 
 # Enabling FK pragma to avoid IntegrityErrors when testing models
 @event.listens_for(Engine, "connect")
@@ -26,6 +27,9 @@ def app():
 
     with _app.app_context():
         _db.init_app(_app)
+        
+        # tested route blueprints
+        _app.register_blueprint(expense_bp)
 
     yield _app
 
@@ -126,3 +130,23 @@ def mock_auth_utils_cache(mocker):
     # Patch 'cache' where it's referenced in app.auth_utils
     mocker.patch('app.auth_utils.cache', new=mock_cache_instance)
     return mock_cache_instance
+
+@pytest.fixture(autouse=True)
+def mock_auth_for_protected_routes(
+    mocker,
+    mock_get_token_auth_header,
+    mock_get_jwks_from_auth0_uncached,
+    mock_verify_decode_jwt,
+    mock_auth_utils_cache
+):
+    """
+    Automatically mock auth and internal user lookup for all protected route tests.
+    """
+    mock_get_token_auth_header.return_value = "Bearer test-token"
+    mock_get_jwks_from_auth0_uncached.return_value = {"keys": []}
+    mock_verify_decode_jwt.return_value = {"sub": MOCK_AUTH0_SUBJECT_ID}
+
+    mocker.patch(
+        "app.api_helpers.get_internal_user_id_from_auth0_sub",
+        return_value=MOCK_FINTRACK_USER_ID
+    )

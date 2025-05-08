@@ -4,6 +4,7 @@ from models.expense import Expense
 from app.api_helpers import get_internal_user_id_from_auth0_sub
 from decimal import Decimal
 import datetime
+from datetime import timezone
 from app.extensions import db
 
 expense_bp = Blueprint('expenses', __name__)
@@ -29,25 +30,23 @@ def create_expense():
 
     description = data.get('description')
     amount_str = data.get('amount')
-    category = data.get('category') # Optional
+    category = data.get('category')  # Optional
     date_str = data.get('date')     # Optional, defaults to now if not provided
 
     print(f"DEBUG: Received data['amount']: '{amount_str}', type: {type(amount_str)}")
-    amount = Decimal(str(amount_str))
-    print(f"DEBUG: Type cast amount_str to decimal: {amount}")
+    
+    try:
+        amount = Decimal(str(amount_str))
+        print(f"DEBUG: Type cast amount_str to decimal: {amount}")
+        if amount <= 0:  # Assuming expenses must be positive
+            return jsonify({"error": "Amount must be a positive number."}), 400
+    except Exception:
+        return jsonify({"error": "Invalid amount format. Must be a number."}), 400
 
     if not isinstance(description, str) or not (0 < len(description) <= 200):
         return jsonify({"error": "Description must be a string between 1 and 200 characters."}), 400
 
-    try:
-        # Ensure amount is a valid decimal
-        amount = Decimal(str(amount_str))
-        if amount <= 0: # Assuming expenses must be positive
-            return jsonify({"error": "Amount must be a positive number."}), 400
-    except Exception: # Catches InvalidOperation from Decimal conversion
-        return jsonify({"error": "Invalid amount format. Must be a number."}), 400
-
-    expense_date = datetime.datetime.utcnow() # Default to now
+    expense_date = datetime.datetime.now(timezone.utc)  # Default to now
     if date_str:
         try:
             expense_date = datetime.datetime.fromisoformat(date_str.replace('Z', '+00:00'))
@@ -68,11 +67,10 @@ def create_expense():
         )
         db.session.add(new_expense)
         db.session.commit()
-        return jsonify(new_expense.to_dict()), 201 # 201 Created
+        return jsonify(new_expense.to_dict()), 201  # 201 Created
     except Exception as e:
         db.session.rollback()
-        # Log the exception e
-        print(f"Error creating expense: {e}") # Basic logging
+        print(f"Error creating expense: {e}")  # Basic logging
         return jsonify({"error": "An error occurred while creating the expense."}), 500
 
 
