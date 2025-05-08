@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { Navigate } from 'react-router-dom';
 import { useAuth0 } from '@auth0/auth0-react';
 
@@ -11,5 +12,9 @@ const ProtectedRoute = ({ component: Component, ...rest }) => {
 
     return isAuthenticated ? <Component {...rest} /> : <Navigate to="/" replace />;
 };
+
+ProtectedRoute.propTypes = {
+    component: PropTypes.elementType.isRequired,
+};  
 
 export default ProtectedRoute;
