@@ -66,17 +66,27 @@ class Config:
 class TestingConfig(Config):
     """Testing-specific configuration."""
     TESTING = True
+    DEBUG = True
+
     # in-memory SQLite database for tests
     SQLALCHEMY_DATABASE_URI = "sqlite:///:memory:"
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     # Define server name for testing exteral url gen
     SERVER_NAME = "localhost"
 
     # Caching for tests
     CACHE_TYPE = 'SimpleCache' # Use simplecache so tests dont need our external redis instance
+    CACHE_DEFAULT_TIMEOUT = 300
+    ALGORITHMS = ["RS256"]
 
     SECRET_KEY = 'test_secretkey' # Simple key adequate for tests
     # Dummy Auth0 values for testing config (mocks will bypass actual use)
-    AUTH0_DOMAIN = 'testing.auth0.com'
-    AUTH0_CLIENT_ID = 'test_client_id'
-    AUTH0_CLIENT_SECRET = 'test_client_secret'
+    AUTH0_DOMAIN = "testing.auth0.com"
+    AUTH0_CLIENT_ID = "test_client_id"
+    AUTH0_CLIENT_SECRET = "test_client_secret"
+    AUTH0_API_AUDIENCE = "test-api-audience"
+    KID="test-kid-123"
+    
+    # Other
+    WTF_CSRF_ENABLED = False
