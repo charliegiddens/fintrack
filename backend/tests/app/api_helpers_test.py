@@ -1,14 +1,14 @@
 from unittest.mock import MagicMock
 
-from app.api_helpers import get_internal_user_id_from_auth0_sub
+from app.api_helpers import get_or_create_internal_user_id
 
 def test_get_internal_user_id_with_none_auth0_id():
     """Test that providing None for auth0_subject_id returns None."""
-    assert get_internal_user_id_from_auth0_sub(None) is None
+    assert get_or_create_internal_user_id(None) is None
 
 def test_get_internal_user_id_with_empty_auth0_id():
     """Test that providing an empty string for auth0_subject_id returns None."""
-    assert get_internal_user_id_from_auth0_sub("") is None
+    assert get_or_create_internal_user_id("") is None
 
 def test_get_internal_user_id_user_found(mocker):
     """Test the case where a user is found for the given auth0_subject_id."""
@@ -23,7 +23,7 @@ def test_get_internal_user_id_user_found(mocker):
     mock_User_class.query.filter_by.return_value.first.return_value = mock_user_instance
 
     auth0_id = "auth0|some_valid_subject"
-    result = get_internal_user_id_from_auth0_sub(auth0_id)
+    result = get_or_create_internal_user_id(auth0_id)
 
     assert result == 123
 
@@ -38,7 +38,7 @@ def test_get_internal_user_id_user_not_found(mocker):
     mock_User_class.query.filter_by.return_value.first.return_value = None
 
     auth0_id = "auth0|some_nonexistent_subject"
-    result = get_internal_user_id_from_auth0_sub(auth0_id)
+    result = get_or_create_internal_user_id(auth0_id)
 
     assert result is None
 

@@ -1,7 +1,7 @@
 from flask import Blueprint, jsonify, g, request
 from app.auth_utils import requires_auth
 from models.expense import Expense
-from app.api_helpers import get_internal_user_id_from_auth0_sub, create_internal_user_from_auth0_sub
+from app.api_helpers import get_or_create_internal_user_id
 from decimal import Decimal
 import datetime
 from datetime import timezone
@@ -13,11 +13,12 @@ expense_bp = Blueprint('expenses', __name__)
 @requires_auth
 def create_expense():
     auth0_subject_id = g.current_user.get("sub")
-    fintrack_user_id = get_internal_user_id_from_auth0_sub(auth0_subject_id)
-
-    if not fintrack_user_id:
-        # Create a new user from Auth0 subject if not found
-        fintrack_user_id = create_internal_user_from_auth0_sub(auth0_subject_id, g.current_user.get("email"))
+    email = g.current_user.get("email")
+    fintrack_user_id = get_or_create_internal_user_id(
+        auth0_subject_id,
+        email=email,
+        create_if_missing=True
+    )
 
     if not fintrack_user_id:
         return jsonify({"error": "Authenticated user not found in local database."}), 404
@@ -82,11 +83,7 @@ def create_expense():
 @requires_auth
 def get_expense_by_id(expense_id): # expense_id is now a path parameter
     auth0_subject_id = g.current_user.get("sub")
-    fintrack_user_id = get_internal_user_id_from_auth0_sub(auth0_subject_id)
-
-    if not fintrack_user_id:
-        # Create a new user from Auth0 subject if not found
-        fintrack_user_id = create_internal_user_from_auth0_sub(auth0_subject_id, g.current_user.get("email"))
+    fintrack_user_id = get_or_create_internal_user_id(auth0_subject_id)
 
     if not fintrack_user_id:
         return jsonify({"error": "Authenticated user not found in local database."}), 404

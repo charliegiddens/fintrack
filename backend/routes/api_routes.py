@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, g
 from app.auth_utils import requires_auth
-from app.api_helpers import get_internal_user_id_from_auth0_sub
+from app.api_helpers import get_or_create_internal_user_id
 
 api_bp = Blueprint('api', __name__)
 
@@ -14,7 +14,7 @@ def private_endpoint():
     if hasattr(g, 'current_user'):
         user_payload = g.current_user
         auth0_subject_id = user_payload.get("sub")
-        local_user_id = get_internal_user_id_from_auth0_sub(auth0_subject_id)
+        local_user_id = get_or_create_internal_user_id(auth0_subject_id)
 
         return jsonify(message=f"Auth0 User ID: {auth0_subject_id} | Fintrack User ID: {local_user_id}")
 

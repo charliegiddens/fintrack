@@ -148,6 +148,6 @@ def mock_auth_for_protected_routes(
     mock_verify_decode_jwt.return_value = {"sub": MOCK_AUTH0_SUBJECT_ID}
 
     mocker.patch(
-        "app.api_helpers.get_internal_user_id_from_auth0_sub",
+        "app.api_helpers.get_or_create_internal_user_id",
         return_value=MOCK_FINTRACK_USER_ID
     )

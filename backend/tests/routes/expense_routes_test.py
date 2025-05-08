@@ -62,8 +62,7 @@ def test_create_expense_invalid_category(client):
 
 @pytest.mark.usefixtures("seed_test_user")
 def test_create_expense_user_not_found(client, mocker):
-    mocker.patch("routes.expense_routes.create_internal_user_from_auth0_sub", return_value=None) # We also need to mock user creation to avoid creating this user
-    mocker.patch('routes.expense_routes.get_internal_user_id_from_auth0_sub', return_value=None)
+    mocker.patch("routes.expense_routes.get_or_create_internal_user_id", return_value=None)
     
     response = client.post('/create', json={
         "description": "Test expense",
@@ -123,7 +122,7 @@ def test_get_expense_by_id_wrong_user(client, mocker, db, seed_test_user):
     db.session.add(expense)
     db.session.commit()
 
-    mocker.patch('routes.expense_routes.get_internal_user_id_from_auth0_sub', return_value=1)
+    mocker.patch('routes.expense_routes.get_or_create_internal_user_id', return_value=1)
 
     response = client.get(f"/get_by_id/{expense.id}")
     assert response.status_code == 401
@@ -132,7 +131,6 @@ def test_get_expense_by_id_wrong_user(client, mocker, db, seed_test_user):
 
 @pytest.mark.usefixtures("seed_test_user")
 def test_get_expense_user_not_found(client, mocker):
-    mocker.patch("routes.expense_routes.create_internal_user_from_auth0_sub", return_value=None) # We also need to mock user creation to avoid creating this user
-    mocker.patch("routes.expense_routes.get_internal_user_id_from_auth0_sub", return_value=None)
+    mocker.patch("routes.expense_routes.get_or_create_internal_user_id", return_value=None)
     response = client.get("/get_by_id/1")
     assert response.status_code == 404
