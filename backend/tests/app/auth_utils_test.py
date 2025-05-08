@@ -8,23 +8,6 @@ from app.auth_utils import (
 
 from tests.conftest import SAMPLE_JWKS, SAMPLE_PAYLOAD, TEST_TOKEN
 
-# # --- Mock Fixtures for requires_auth dependencies ---
-# @pytest.fixture
-# def mock_get_token_auth_header(mocker):
-#     """Mocks app.auth_utils.get_token_auth_header"""
-#     return mocker.patch('app.auth_utils.get_token_auth_header')
-
-# @pytest.fixture
-# def mock_get_jwks_from_auth0_uncached(mocker):
-#     """Mocks app.auth_utils.get_jwks_from_auth0_uncached"""
-#     return mocker.patch('app.auth_utils.get_jwks_from_auth0_uncached')
-
-# @pytest.fixture
-# def mock_verify_decode_jwt(mocker):
-#     """Mocks app.auth_utils.verify_decode_jwt"""
-#     return mocker.patch('app.auth_utils.verify_decode_jwt')
-
-
 # --- Tests for requires_auth decorator ---
 def test_requires_auth_success(
     app_context, request_context, # Flask contexts

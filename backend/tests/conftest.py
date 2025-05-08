@@ -9,7 +9,6 @@ from sqlalchemy.engine import Engine
 from app.config import TestingConfig
 from app.extensions import db as _db
 
-
 # Enabling FK pragma to avoid IntegrityErrors when testing models
 @event.listens_for(Engine, "connect")
 def set_sqlite_pragma(dbapi_connection, connection_record):
