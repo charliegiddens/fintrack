@@ -37,12 +37,9 @@ def create_expense():
     amount_str = data.get('amount')
     category = data.get('category')  # Optional
     date_str = data.get('date')     # Optional, defaults to now if not provided
-
-    print(f"DEBUG: Received data['amount']: '{amount_str}', type: {type(amount_str)}")
     
     try:
         amount = Decimal(str(amount_str))
-        print(f"DEBUG: Type cast amount_str to decimal: {amount}")
         if amount <= 0:  # Assuming expenses must be positive
             return jsonify({"error": "Amount must be a positive number."}), 400
     except Exception:
