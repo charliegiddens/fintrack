@@ -20,6 +20,7 @@ def create_app(config_class=None):
     match os.getenv("FLASK_ENV"):
         case "development":
             app.config.from_object(DevelopmentConfig)
+            app.debug = True
         case "staging":
             app.config.from_object(StagingConfig)
         case "production":
