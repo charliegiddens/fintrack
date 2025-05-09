@@ -32,7 +32,7 @@ jobs:
     - name: Run tests with Jest
       working-directory: ./frontend
       run: |
-        npm test -- --cidr --runInBand
+        npm test -- --ci --runInBand
 
     - name: Build the app
       working-directory: ./frontend
