@@ -6,7 +6,7 @@ import os
 
 # import extensions
 from .extensions import db, cache
-from .config import Config, DevelopmentConfig
+from .config import Config, DevelopmentConfig, StagingConfig, ProductionConfig
 
 # import blueprints
 from routes.api_routes import api_bp
@@ -17,11 +17,16 @@ def create_app(config_class=None):
     app = Flask(__name__)
 
     # Select appropriate config per flask environment
-    env = os.getenv("FLASK_ENV", "production")
-    if env == "development":
-        app.config.from_object(DevelopmentConfig)
-    else:
-        app.config.from_object(Config)
+    match os.getenv("FLASK_ENV"):
+        case "development":
+            app.config.from_object(DevelopmentConfig)
+        case "staging":
+            app.config.from_object(StagingConfig)
+        case "production":
+            app.config.from_object(ProductionConfig)
+        case _:
+            raise RuntimeError("FLASK_ENV must be set to 'development', 'staging', or 'production'") 
+        
 
     # initialise extensions
     db.init_app(app)
@@ -58,10 +63,6 @@ def create_app(config_class=None):
     @app.errorhandler(404)
     def page_not_found(e):
         return jsonify(error=404, text=str(e)), 404
-        
-    @app.route("/health")
-    def health_check():
-        return jsonify(status="healthy")
 
     return app
 
