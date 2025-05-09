@@ -86,7 +86,7 @@ class Config:
     if not TESTING and not all([AUTH0_CLIENT_ID, AUTH0_CLIENT_SECRET, AUTH0_DOMAIN, AUTH0_API_AUDIENCE]):
         print("Warning: Auth0 environment variables not fully set.")
 
-class DevelopmentConfig(Config):
+class DevelopmentConfig():
     """Development configuration variables."""
     SECRET_KEY = os.environ.get('DEV_APP_SECRET_KEY')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
@@ -108,7 +108,7 @@ class DevelopmentConfig(Config):
     AUTH0_DOMAIN = os.environ.get('DEV_AUTH0_DOMAIN')
     AUTH0_API_AUDIENCE = os.environ.get('DEV_AUTH0_API_AUDIENCE')
 
-class StagingConfig(Config):
+class StagingConfig():
     """Staging configuration variables."""
     SECRET_KEY = os.environ.get('STAGING_APP_SECRET_KEY')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
@@ -190,7 +190,7 @@ class StagingConfig(Config):
     if not TESTING and not all([AUTH0_CLIENT_ID, AUTH0_CLIENT_SECRET, AUTH0_DOMAIN, AUTH0_API_AUDIENCE]):
         print("Warning: Auth0 environment variables not fully set.")
 
-class ProductionConfig(Config):
+class ProductionConfig():
     """Production configuration variables."""
     SECRET_KEY = os.environ.get('PROD_APP_SECRET_KEY')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
@@ -272,7 +272,7 @@ class ProductionConfig(Config):
     if not TESTING and not all([AUTH0_CLIENT_ID, AUTH0_CLIENT_SECRET, AUTH0_DOMAIN, AUTH0_API_AUDIENCE]):
         print("Warning: Auth0 environment variables not fully set.")
 
-class TestingConfig(Config):
+class TestingConfig():
     """Testing-specific configuration."""
     TESTING = True
     DEBUG = True
