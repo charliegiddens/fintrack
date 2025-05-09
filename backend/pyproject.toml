@@ -1,4 +1,4 @@
 [tool.ruff]
 line-length = 200
-select = ["E", "F"]
+lint.select = ["E", "F"]
 exclude = ["migrations", "__pycache__"]
