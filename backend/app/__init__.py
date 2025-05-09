@@ -37,7 +37,6 @@ def create_app(config_class=None):
             r"/api/*": {
                 "origins": [
                     app.config['FRONTEND_ORIGIN']
-                    # add prod frontend env later
                 ],
                 "supports_credentials": True
             }
