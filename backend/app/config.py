@@ -44,19 +44,25 @@ class StagingConfig:
     CACHE_PORT = os.getenv("STAGING_CACHE_PORT")
     ALGORITHMS = os.getenv("STAGING_CACHE_ALGORITHMS")
 
+    CACHE_REDIS_URL = (
+        f"{CACHE_PROTOCOL}://:{CACHE_ACCESS_KEY}@{CACHE_SERVER}:{CACHE_PORT}/0"
+        if all([CACHE_PROTOCOL, CACHE_ACCESS_KEY, CACHE_SERVER, CACHE_PORT])
+        else None
+    )
+
     # SQLAlchemy URI
-    _DB_PROTOCOL = os.getenv('STAGING_DB_PROTOCOL')
-    _DB_USER = os.getenv('STAGING_DB_USER')
-    _DB_PASSWORD = quote_plus(os.getenv('STAGING_DB_PASSWORD', ''))
-    _DB_SERVER = os.getenv('STAGING_DB_SERVER')
-    _DB_PORT = os.getenv('STAGING_DB_PORT')
-    _DB_DATABASE = os.getenv('STAGING_DB_DATABASE')
-    _DB_DRIVER = os.getenv('STAGING_DB_DRIVER')
-    _DB_QUERY = urlencode({'driver': _DB_DRIVER, 'Encrypt': 'yes', 'TrustServerCertificate': 'no'})
+    DB_PROTOCOL = os.getenv('STAGING_DB_PROTOCOL')
+    DB_USER = os.getenv('STAGING_DB_USER')
+    DB_PASSWORD = quote_plus(os.getenv('STAGING_DB_PASSWORD', ''))
+    DB_SERVER = os.getenv('STAGING_DB_SERVER')
+    DB_PORT = os.getenv('STAGING_DB_PORT')
+    DB_DATABASE = os.getenv('STAGING_DB_DATABASE')
+    DB_DRIVER = os.getenv('STAGING_DB_DRIVER')
+    DB_QUERY = urlencode({'driver': DB_DRIVER, 'Encrypt': 'yes', 'TrustServerCertificate': 'no'})
 
     SQLALCHEMY_DATABASE_URI = (
-        f"{_DB_PROTOCOL}://{_DB_USER}:{_DB_PASSWORD}@{_DB_SERVER}:{_DB_PORT}/{_DB_DATABASE}?{_DB_QUERY}"
-        if all([_DB_PROTOCOL, _DB_USER, _DB_PASSWORD, _DB_SERVER, _DB_PORT, _DB_DATABASE, _DB_DRIVER])
+        f"{DB_PROTOCOL}://{DB_USER}:{DB_PASSWORD}@{DB_SERVER}:{DB_PORT}/{DB_DATABASE}?{DB_QUERY}"
+        if all([DB_PROTOCOL, DB_USER, DB_PASSWORD, DB_SERVER, DB_PORT, DB_DATABASE, DB_DRIVER])
         else None
     )
 
@@ -81,18 +87,24 @@ class ProductionConfig(StagingConfig):
     CACHE_PORT = os.getenv("PROD_CACHE_PORT")
     ALGORITHMS = os.getenv("PROD_CACHE_ALGORITHMS")
 
-    _DB_PROTOCOL = os.getenv('PROD_DB_PROTOCOL')
-    _DB_USER = os.getenv('PROD_DB_USER')
-    _DB_PASSWORD = quote_plus(os.getenv('PROD_DB_PASSWORD', ''))
-    _DB_SERVER = os.getenv('PROD_DB_SERVER')
-    _DB_PORT = os.getenv('PROD_DB_PORT')
-    _DB_DATABASE = os.getenv('PROD_DB_DATABASE')
-    _DB_DRIVER = os.getenv('PROD_DB_DRIVER')
-    _DB_QUERY = urlencode({'driver': _DB_DRIVER, 'Encrypt': 'yes', 'TrustServerCertificate': 'no'})
+    CACHE_REDIS_URL = (
+        f"{CACHE_PROTOCOL}://:{CACHE_ACCESS_KEY}@{CACHE_SERVER}:{CACHE_PORT}/0"
+        if all([CACHE_PROTOCOL, CACHE_ACCESS_KEY, CACHE_SERVER, CACHE_PORT])
+        else None
+    )
+
+    DB_PROTOCOL = os.getenv('PROD_DB_PROTOCOL')
+    DB_USER = os.getenv('PROD_DB_USER')
+    DB_PASSWORD = quote_plus(os.getenv('PROD_DB_PASSWORD', ''))
+    DB_SERVER = os.getenv('PROD_DB_SERVER')
+    DB_PORT = os.getenv('PROD_DB_PORT')
+    DB_DATABASE = os.getenv('PROD_DB_DATABASE')
+    DB_DRIVER = os.getenv('PROD_DB_DRIVER')
+    DB_QUERY = urlencode({'driver': DB_DRIVER, 'Encrypt': 'yes', 'TrustServerCertificate': 'no'})
 
     SQLALCHEMY_DATABASE_URI = (
-        f"{_DB_PROTOCOL}://{_DB_USER}:{_DB_PASSWORD}@{_DB_SERVER}:{_DB_PORT}/{_DB_DATABASE}?{_DB_QUERY}"
-        if all([_DB_PROTOCOL, _DB_USER, _DB_PASSWORD, _DB_SERVER, _DB_PORT, _DB_DATABASE, _DB_DRIVER])
+        f"{DB_PROTOCOL}://{DB_USER}:{DB_PASSWORD}@{DB_SERVER}:{DB_PORT}/{DB_DATABASE}?{DB_QUERY}"
+        if all([DB_PROTOCOL, DB_USER, DB_PASSWORD, DB_SERVER, DB_PORT, DB_DATABASE, DB_DRIVER])
         else None
     )
 
