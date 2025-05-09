@@ -4,77 +4,37 @@ from urllib.parse import quote_plus, urlencode
 
 load_dotenv()
 
-class DevelopmentConfig():
-    """Development configuration variables."""
-    SECRET_KEY = os.environ.get('DEV_APP_SECRET_KEY')
+class DevelopmentConfig:
+    TESTING = False
+    SECRET_KEY = os.getenv('DEV_APP_SECRET_KEY')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    FRONTEND_ORIGIN = os.getenv('DEV_FRONTEND_ORIGIN')
+    SQLALCHEMY_DATABASE_URI = os.getenv("DEV_DB_URI")
 
-    # CORS
-    FRONTEND_ORIGIN = os.environ.get('DEV_FRONTEND_ORIGIN')
-
-    # Database URI for local development (SQLite in-memory)
-    SQLALCHEMY_DATABASE_URI = os.environ.get("DEV_DB_URI")
-    SQLALCHEMY_TRACK_MODIFICATIONS = False
-    
-    # Redis configuration
-    CACHE_TYPE = os.environ.get("DEV_CACHE_TYPE")
+    # Redis
+    CACHE_TYPE = os.getenv("DEV_CACHE_TYPE")
     CACHE_DEFAULT_TIMEOUT = 300
 
-    # Auth0 - In development, you might use a different set of credentials for testing
-    AUTH0_CLIENT_ID = os.environ.get('DEV_AUTH0_CLIENT_ID')
-    AUTH0_CLIENT_SECRET = os.environ.get('DEV_AUTH0_CLIENT_SECRET')
-    AUTH0_DOMAIN = os.environ.get('DEV_AUTH0_DOMAIN')
-    AUTH0_API_AUDIENCE = os.environ.get('DEV_AUTH0_API_AUDIENCE')
+    # Auth0
+    AUTH0_CLIENT_ID = os.getenv('DEV_AUTH0_CLIENT_ID')
+    AUTH0_CLIENT_SECRET = os.getenv('DEV_AUTH0_CLIENT_SECRET')
+    AUTH0_DOMAIN = os.getenv('DEV_AUTH0_DOMAIN')
+    AUTH0_API_AUDIENCE = os.getenv('DEV_AUTH0_API_AUDIENCE')
 
-class StagingConfig():
-    """Staging configuration variables."""
-    SECRET_KEY = os.environ.get('STAGING_APP_SECRET_KEY')
-    SQLALCHEMY_TRACK_MODIFICATIONS = False
+
+class StagingConfig:
     TESTING = False
+    SECRET_KEY = os.getenv('STAGING_APP_SECRET_KEY')
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
+    FRONTEND_ORIGIN = os.getenv('STAGING_FRONTEND_ORIGIN')
 
-    # CORS
-    FRONTEND_ORIGIN = os.environ.get('STAGING_FRONTEND_ORIGIN')
+    # Auth0
+    AUTH0_CLIENT_ID = os.getenv('STAGING_AUTH0_CLIENT_ID')
+    AUTH0_CLIENT_SECRET = os.getenv('STAGING_AUTH0_CLIENT_SECRET')
+    AUTH0_DOMAIN = os.getenv('STAGING_AUTH0_DOMAIN')
+    AUTH0_API_AUDIENCE = os.getenv('STAGING_AUTH0_API_AUDIENCE')
 
-    # Load DB components from environment
-    DB_PROTOCOL = os.environ.get('STAGING_DB_PROTOCOL')
-    DB_USER = os.environ.get('STAGING_DB_USER')
-    DB_PASSWORD_RAW = os.environ.get('STAGING_DB_PASSWORD')
-    DB_SERVER = os.environ.get('STAGING_DB_SERVER')
-    DB_PORT = os.environ.get('STAGING_DB_PORT')
-    DB_DATABASE = os.environ.get('STAGING_DB_DATABASE')
-    DB_DRIVER = os.environ.get('STAGING_DB_DRIVER')
-
-    # Check all DB env variables are declared.
-    if not all([DB_PROTOCOL, DB_USER, DB_PASSWORD_RAW, DB_SERVER, DB_DATABASE, DB_DRIVER]):
-        print("--- DEBUG: One or more DB env vars missing! ---")
-        print(f"DB_PROTOCOL: {'Set' if DB_PROTOCOL else 'MISSING'}")
-        print(f"DB_USER: {'Set' if DB_USER else 'MISSING'}")
-        print(f"DB_PASSWORD_RAW: {'Set' if DB_PASSWORD_RAW else 'MISSING'}")
-        print(f"DB_SERVER: {'Set' if DB_SERVER else 'MISSING'}")
-        print(f"DB_DATABASE: {'Set' if DB_DATABASE else 'MISSING'}")
-        print(f"DB_DRIVER: {'Set' if DB_DRIVER else 'MISSING'}")
-        raise ValueError("Missing one or more core database environment variables")
-
-    # Construct DB URI only if not testing (and if all vars are present)
-    SQLALCHEMY_DATABASE_URI = None
-    if DB_PROTOCOL and DB_USER and DB_PASSWORD_RAW and DB_SERVER and DB_DATABASE and DB_DRIVER:
-        DB_PASSWORD_ENCODED = quote_plus(DB_PASSWORD_RAW)
-        query_params = {'driver': DB_DRIVER, 'Encrypt': 'yes', 'TrustServerCertificate': 'no'}
-        query_string = urlencode(query_params)
-        SQLALCHEMY_DATABASE_URI = (
-            f"{DB_PROTOCOL}://{DB_USER}:{DB_PASSWORD_ENCODED}@{DB_SERVER}:{DB_PORT}/"
-            f"{DB_DATABASE}?{query_string}"
-        )
-    elif not TESTING:
-        print("Warning: Standard DB environment variables not fully set.")
-
-    # --- Auth0 Config ---
-    AUTH0_CLIENT_ID = os.environ.get('STAGING_AUTH0_CLIENT_ID')
-    AUTH0_CLIENT_SECRET = os.environ.get('STAGING_AUTH0_CLIENT_SECRET')
-    AUTH0_DOMAIN = os.environ.get('STAGING_AUTH0_DOMAIN')
-    AUTH0_API_AUDIENCE = os.environ.get('STAGING_AUTH0_API_AUDIENCE')
-
-    # --- Redis Config ---
+    # Redis
     CACHE_TYPE = os.getenv("STAGING_CACHE_TYPE")
     CACHE_REDIS_SSL = os.getenv("STAGING_CACHE_REDIS_SSL")
     CACHE_PROTOCOL = os.getenv("STAGING_CACHE_PROTOCOL")
@@ -84,79 +44,34 @@ class StagingConfig():
     CACHE_PORT = os.getenv("STAGING_CACHE_PORT")
     ALGORITHMS = os.getenv("STAGING_CACHE_ALGORITHMS")
 
-    if not all([CACHE_TYPE, CACHE_REDIS_SSL, CACHE_PROTOCOL, CACHE_DEFAULT_TIMEOUT, CACHE_ACCESS_KEY, CACHE_SERVER, CACHE_PORT, ALGORITHMS]):
-        print("--- DEBUG: One or more DB env vars missing! ---")
-        print(f"CACHE_TYPE: {'Set' if CACHE_TYPE else 'MISSING'}")
-        print(f"CACHE_REDIS_SSL: {'Set' if CACHE_REDIS_SSL else 'MISSING'}")
-        print(f"CACHE_PROTOCOL: {'Set' if CACHE_PROTOCOL else 'MISSING'}")
-        print(f"CACHE_DEFAULT_TIMEOUT: {'Set' if CACHE_DEFAULT_TIMEOUT else 'MISSING'}")
-        print(f"CACHE_ACCESS_KEY: {'Set' if CACHE_ACCESS_KEY else 'MISSING'}")
-        print(f"CACHE_SERVER: {'Set' if CACHE_SERVER else 'MISSING'}")
-        print(f"CACHE_PORT: {'Set' if CACHE_PORT else 'MISSING'}")
-        print(f"ALGORITHMS: {'Set' if ALGORITHMS else 'MISSING'}")
-        raise ValueError("Missing one or more core Redis environment variables")
+    # SQLAlchemy URI
+    _DB_PROTOCOL = os.getenv('STAGING_DB_PROTOCOL')
+    _DB_USER = os.getenv('STAGING_DB_USER')
+    _DB_PASSWORD = quote_plus(os.getenv('STAGING_DB_PASSWORD', ''))
+    _DB_SERVER = os.getenv('STAGING_DB_SERVER')
+    _DB_PORT = os.getenv('STAGING_DB_PORT')
+    _DB_DATABASE = os.getenv('STAGING_DB_DATABASE')
+    _DB_DRIVER = os.getenv('STAGING_DB_DRIVER')
+    _DB_QUERY = urlencode({'driver': _DB_DRIVER, 'Encrypt': 'yes', 'TrustServerCertificate': 'no'})
 
-    CACHE_REDIS_URL = None
-    if CACHE_PROTOCOL and CACHE_ACCESS_KEY and CACHE_SERVER and CACHE_PORT:
-        DB_PASSWORD_ENCODED = quote_plus(DB_PASSWORD_RAW)
-        query_params = {'driver': DB_DRIVER, 'Encrypt': 'yes', 'TrustServerCertificate': 'no'}
-        query_string = urlencode(query_params)
-        CACHE_REDIS_URL = (
-            f"{CACHE_PROTOCOL}://:{CACHE_ACCESS_KEY}@{CACHE_SERVER}:{CACHE_PORT}/0"
-        )
+    SQLALCHEMY_DATABASE_URI = (
+        f"{_DB_PROTOCOL}://{_DB_USER}:{_DB_PASSWORD}@{_DB_SERVER}:{_DB_PORT}/{_DB_DATABASE}?{_DB_QUERY}"
+        if all([_DB_PROTOCOL, _DB_USER, _DB_PASSWORD, _DB_SERVER, _DB_PORT, _DB_DATABASE, _DB_DRIVER])
+        else None
+    )
 
-    if not TESTING and not all([AUTH0_CLIENT_ID, AUTH0_CLIENT_SECRET, AUTH0_DOMAIN, AUTH0_API_AUDIENCE]):
-        print("Warning: Auth0 environment variables not fully set.")
 
-class ProductionConfig():
-    """Production configuration variables."""
-    SECRET_KEY = os.environ.get('PROD_APP_SECRET_KEY')
-    SQLALCHEMY_TRACK_MODIFICATIONS = False
-    TESTING = False
+class ProductionConfig(StagingConfig):
+    """Same structure as staging, just reads from PROD_ vars."""
 
-    # CORS
-    FRONTEND_ORIGIN = os.environ.get('PROD_FRONTEND_ORIGIN')
+    SECRET_KEY = os.getenv('PROD_APP_SECRET_KEY')
+    FRONTEND_ORIGIN = os.getenv('PROD_FRONTEND_ORIGIN')
 
-    # Load DB components from environment
-    DB_PROTOCOL = os.environ.get('PROD_DB_PROTOCOL')
-    DB_USER = os.environ.get('PROD_DB_USER')
-    DB_PASSWORD_RAW = os.environ.get('PROD_DB_PASSWORD')
-    DB_SERVER = os.environ.get('PROD_DB_SERVER')
-    DB_PORT = os.environ.get('PROD_DB_PORT')
-    DB_DATABASE = os.environ.get('PROD_DB_DATABASE')
-    DB_DRIVER = os.environ.get('PROD_DB_DRIVER')
+    AUTH0_CLIENT_ID = os.getenv('PROD_AUTH0_CLIENT_ID')
+    AUTH0_CLIENT_SECRET = os.getenv('PROD_AUTH0_CLIENT_SECRET')
+    AUTH0_DOMAIN = os.getenv('PROD_AUTH0_DOMAIN')
+    AUTH0_API_AUDIENCE = os.getenv('PROD_AUTH0_API_AUDIENCE')
 
-    # Check all DB env variables are declared.
-    if not all([DB_PROTOCOL, DB_USER, DB_PASSWORD_RAW, DB_SERVER, DB_DATABASE, DB_DRIVER]):
-        print("--- DEBUG: One or more DB env vars missing! ---")
-        print(f"DB_PROTOCOL: {'Set' if DB_PROTOCOL else 'MISSING'}")
-        print(f"DB_USER: {'Set' if DB_USER else 'MISSING'}")
-        print(f"DB_PASSWORD_RAW: {'Set' if DB_PASSWORD_RAW else 'MISSING'}")
-        print(f"DB_SERVER: {'Set' if DB_SERVER else 'MISSING'}")
-        print(f"DB_DATABASE: {'Set' if DB_DATABASE else 'MISSING'}")
-        print(f"DB_DRIVER: {'Set' if DB_DRIVER else 'MISSING'}")
-        raise ValueError("Missing one or more core database environment variables")
-
-    # Construct DB URI only if not testing (and if all vars are present)
-    SQLALCHEMY_DATABASE_URI = None
-    if DB_PROTOCOL and DB_USER and DB_PASSWORD_RAW and DB_SERVER and DB_DATABASE and DB_DRIVER:
-        DB_PASSWORD_ENCODED = quote_plus(DB_PASSWORD_RAW)
-        query_params = {'driver': DB_DRIVER, 'Encrypt': 'yes', 'TrustServerCertificate': 'no'}
-        query_string = urlencode(query_params)
-        SQLALCHEMY_DATABASE_URI = (
-            f"{DB_PROTOCOL}://{DB_USER}:{DB_PASSWORD_ENCODED}@{DB_SERVER}:{DB_PORT}/"
-            f"{DB_DATABASE}?{query_string}"
-        )
-    elif not TESTING:
-        print("Warning: Standard DB environment variables not fully set.")
-
-    # --- Auth0 Config ---
-    AUTH0_CLIENT_ID = os.environ.get('PROD_AUTH0_CLIENT_ID')
-    AUTH0_CLIENT_SECRET = os.environ.get('PROD_AUTH0_CLIENT_SECRET')
-    AUTH0_DOMAIN = os.environ.get('PROD_AUTH0_DOMAIN')
-    AUTH0_API_AUDIENCE = os.environ.get('PROD_AUTH0_API_AUDIENCE')
-
-    # --- Redis Config ---
     CACHE_TYPE = os.getenv("PROD_CACHE_TYPE")
     CACHE_REDIS_SSL = os.getenv("PROD_CACHE_REDIS_SSL")
     CACHE_PROTOCOL = os.getenv("PROD_CACHE_PROTOCOL")
@@ -166,55 +81,35 @@ class ProductionConfig():
     CACHE_PORT = os.getenv("PROD_CACHE_PORT")
     ALGORITHMS = os.getenv("PROD_CACHE_ALGORITHMS")
 
-    if not all([CACHE_TYPE, CACHE_REDIS_SSL, CACHE_PROTOCOL, CACHE_DEFAULT_TIMEOUT, CACHE_ACCESS_KEY, CACHE_SERVER, CACHE_PORT, ALGORITHMS]):
-        print("--- DEBUG: One or more DB env vars missing! ---")
-        print(f"CACHE_TYPE: {'Set' if CACHE_TYPE else 'MISSING'}")
-        print(f"CACHE_REDIS_SSL: {'Set' if CACHE_REDIS_SSL else 'MISSING'}")
-        print(f"CACHE_PROTOCOL: {'Set' if CACHE_PROTOCOL else 'MISSING'}")
-        print(f"CACHE_DEFAULT_TIMEOUT: {'Set' if CACHE_DEFAULT_TIMEOUT else 'MISSING'}")
-        print(f"CACHE_ACCESS_KEY: {'Set' if CACHE_ACCESS_KEY else 'MISSING'}")
-        print(f"CACHE_SERVER: {'Set' if CACHE_SERVER else 'MISSING'}")
-        print(f"CACHE_PORT: {'Set' if CACHE_PORT else 'MISSING'}")
-        print(f"ALGORITHMS: {'Set' if ALGORITHMS else 'MISSING'}")
-        raise ValueError("Missing one or more core Redis environment variables")
+    _DB_PROTOCOL = os.getenv('PROD_DB_PROTOCOL')
+    _DB_USER = os.getenv('PROD_DB_USER')
+    _DB_PASSWORD = quote_plus(os.getenv('PROD_DB_PASSWORD', ''))
+    _DB_SERVER = os.getenv('PROD_DB_SERVER')
+    _DB_PORT = os.getenv('PROD_DB_PORT')
+    _DB_DATABASE = os.getenv('PROD_DB_DATABASE')
+    _DB_DRIVER = os.getenv('PROD_DB_DRIVER')
+    _DB_QUERY = urlencode({'driver': _DB_DRIVER, 'Encrypt': 'yes', 'TrustServerCertificate': 'no'})
 
-    CACHE_REDIS_URL = None
-    if CACHE_PROTOCOL and CACHE_ACCESS_KEY and CACHE_SERVER and CACHE_PORT:
-        DB_PASSWORD_ENCODED = quote_plus(DB_PASSWORD_RAW)
-        query_params = {'driver': DB_DRIVER, 'Encrypt': 'yes', 'TrustServerCertificate': 'no'}
-        query_string = urlencode(query_params)
-        CACHE_REDIS_URL = (
-            f"{CACHE_PROTOCOL}://:{CACHE_ACCESS_KEY}@{CACHE_SERVER}:{CACHE_PORT}/0"
-        )
+    SQLALCHEMY_DATABASE_URI = (
+        f"{_DB_PROTOCOL}://{_DB_USER}:{_DB_PASSWORD}@{_DB_SERVER}:{_DB_PORT}/{_DB_DATABASE}?{_DB_QUERY}"
+        if all([_DB_PROTOCOL, _DB_USER, _DB_PASSWORD, _DB_SERVER, _DB_PORT, _DB_DATABASE, _DB_DRIVER])
+        else None
+    )
 
-    if not TESTING and not all([AUTH0_CLIENT_ID, AUTH0_CLIENT_SECRET, AUTH0_DOMAIN, AUTH0_API_AUDIENCE]):
-        print("Warning: Auth0 environment variables not fully set.")
 
-class TestingConfig():
-    """Testing-specific configuration."""
-    SQLALCHEMY_TRACK_MODIFICATIONS = False
+class TestingConfig:
     TESTING = True
     DEBUG = True
-
-    # in-memory SQLite database for tests
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_DATABASE_URI = "sqlite:///:memory:"
-    
-
-    # Define server name for testing exteral url gen
     SERVER_NAME = "localhost"
-
-    # Caching for tests
-    CACHE_TYPE = 'SimpleCache' # Use simplecache so tests dont need our external redis instance
+    CACHE_TYPE = 'SimpleCache'
     CACHE_DEFAULT_TIMEOUT = 300
     ALGORITHMS = ["RS256"]
-
-    SECRET_KEY = 'test_secretkey' # Simple key adequate for tests
-    # Dummy Auth0 values for testing config (mocks will bypass actual use)
+    SECRET_KEY = 'test_secretkey'
     AUTH0_DOMAIN = "testing.auth0.com"
     AUTH0_CLIENT_ID = "test_client_id"
     AUTH0_CLIENT_SECRET = "test_client_secret"
     AUTH0_API_AUDIENCE = "test-api-audience"
-    KID="test-kid-123"
-    
-    # Other
+    KID = "test-kid-123"
     WTF_CSRF_ENABLED = False
