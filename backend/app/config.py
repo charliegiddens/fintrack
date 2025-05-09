@@ -10,9 +10,6 @@ class Config:
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     TESTING = False
 
-    # flask cli authentication key
-    CLI_KEY = os.environ.get('CLI_KEY')
-
     # CORS
     FRONTEND_ORIGIN = os.environ.get('FRONTEND_ORIGIN')
 
@@ -67,24 +64,25 @@ class Config:
 
 class DevelopmentConfig(Config):
     """Development configuration variables."""
-    
+    SECRET_KEY = os.environ.get('DEV_APP_SECRET_KEY')
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
+
+    # CORS
+    FRONTEND_ORIGIN = os.environ.get('DEV_FRONTEND_ORIGIN')
+
     # Database URI for local development (SQLite in-memory)
-    SQLALCHEMY_DATABASE_URI = "sqlite:///development.db"
+    SQLALCHEMY_DATABASE_URI = os.environ.get("DEV_DB_URI")
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     
     # Redis configuration
-    CACHE_TYPE = "simple"
+    CACHE_TYPE = os.environ.get("DEV_CACHE_TYPE")
     CACHE_DEFAULT_TIMEOUT = 300
 
     # Auth0 - In development, you might use a different set of credentials for testing
-    AUTH0_CLIENT_ID = os.environ.get('AUTH0_CLIENT_ID')
-    AUTH0_CLIENT_SECRET = os.environ.get('AUTH0_CLIENT_SECRET')
-    AUTH0_DOMAIN = os.environ.get('AUTH0_DOMAIN')
-    AUTH0_API_AUDIENCE = os.environ.get('AUTH0_API_AUDIENCE')
-
-    # Override other settings as needed for local dev
-    SECRET_KEY = os.environ.get('APP_SECRET_KEY', 'dev-secret-key')
-    FRONTEND_ORIGIN = "http://localhost:3000"  # Adjust if you're serving the frontend locally
+    AUTH0_CLIENT_ID = os.environ.get('DEV_AUTH0_CLIENT_ID')
+    AUTH0_CLIENT_SECRET = os.environ.get('DEV_AUTH0_CLIENT_SECRET')
+    AUTH0_DOMAIN = os.environ.get('DEV_AUTH0_DOMAIN')
+    AUTH0_API_AUDIENCE = os.environ.get('DEV_AUTH0_API_AUDIENCE')
 
 class TestingConfig(Config):
     """Testing-specific configuration."""
