@@ -17,6 +17,7 @@ class Config:
     FRONTEND_ORIGIN = os.environ.get('FRONTEND_ORIGIN')
 
     # Load DB components from environment
+    DB_PROTOCOL = os.environ.get('DB_PROTOCOL', 'protocol')
     DB_USER = os.environ.get('DB_USER', 'user')
     DB_PASSWORD_RAW = os.environ.get('DB_PASSWORD', 'password')
     DB_SERVER = os.environ.get('DB_SERVER', 'url')
@@ -25,8 +26,9 @@ class Config:
     DB_DRIVER = os.environ.get('DB_DRIVER', 'ODBC Driver 18 for SQL Server')
 
     # Check all DB env variables are declared.
-    if not all([DB_USER, DB_PASSWORD_RAW, DB_SERVER, DB_DATABASE, DB_DRIVER]):
+    if not all([DB_PROTOCOL, DB_USER, DB_PASSWORD_RAW, DB_SERVER, DB_DATABASE, DB_DRIVER]):
         print("--- DEBUG: One or more DB env vars missing! ---")
+        print(f"DB_PROTOCOL: {'Set' if DB_PROTOCOL else 'MISSING'}")
         print(f"DB_USER: {'Set' if DB_USER else 'MISSING'}")
         print(f"DB_PASSWORD_RAW: {'Set' if DB_PASSWORD_RAW else 'MISSING'}")
         print(f"DB_SERVER: {'Set' if DB_SERVER else 'MISSING'}")
@@ -36,12 +38,12 @@ class Config:
 
     # Construct DB URI only if not testing (and if all vars are present)
     SQLALCHEMY_DATABASE_URI = None
-    if DB_USER and DB_PASSWORD_RAW and DB_SERVER and DB_DATABASE and DB_DRIVER:
+    if DB_PROTOCOL and DB_USER and DB_PASSWORD_RAW and DB_SERVER and DB_DATABASE and DB_DRIVER:
         DB_PASSWORD_ENCODED = quote_plus(DB_PASSWORD_RAW)
         query_params = {'driver': DB_DRIVER, 'Encrypt': 'yes', 'TrustServerCertificate': 'no'}
         query_string = urlencode(query_params)
         SQLALCHEMY_DATABASE_URI = (
-            f"mssql+pyodbc://{DB_USER}:{DB_PASSWORD_ENCODED}@{DB_SERVER}:{DB_PORT}/"
+            f"{DB_PROTOCOL}://{DB_USER}:{DB_PASSWORD_ENCODED}@{DB_SERVER}:{DB_PORT}/"
             f"{DB_DATABASE}?{query_string}"
         )
     elif not TESTING:
@@ -54,14 +56,35 @@ class Config:
     AUTH0_API_AUDIENCE = os.environ.get('AUTH0_API_AUDIENCE')
 
     # --- Redis Config ---
-    CACHE_TYPE = "redis"
+    CACHE_TYPE = os.getenv("CACHE_TYPE")
     CACHE_DEFAULT_TIMEOUT = os.getenv("CACHE_DEFAULT_TIMEOUT")
-    CACHE_REDIS_URL = os.getenv("AZURE_REDIS_URL")
+    CACHE_REDIS_URL = os.getenv("CACHE_URL")
     ALGORITHMS = os.getenv("CACHE_ALGORITHMS")
 
 
     if not TESTING and not all([AUTH0_CLIENT_ID, AUTH0_CLIENT_SECRET, AUTH0_DOMAIN, AUTH0_API_AUDIENCE]):
         print("Warning: Auth0 environment variables not fully set.")
+
+class DevelopmentConfig(Config):
+    """Development configuration variables."""
+    
+    # Database URI for local development (SQLite in-memory)
+    SQLALCHEMY_DATABASE_URI = "sqlite:///development.db"
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
+    
+    # Redis configuration
+    CACHE_TYPE = "simple"
+    CACHE_DEFAULT_TIMEOUT = 300
+
+    # Auth0 - In development, you might use a different set of credentials for testing
+    AUTH0_CLIENT_ID = os.environ.get('AUTH0_CLIENT_ID')
+    AUTH0_CLIENT_SECRET = os.environ.get('AUTH0_CLIENT_SECRET')
+    AUTH0_DOMAIN = os.environ.get('AUTH0_DOMAIN')
+    AUTH0_API_AUDIENCE = os.environ.get('AUTH0_API_AUDIENCE')
+
+    # Override other settings as needed for local dev
+    SECRET_KEY = os.environ.get('APP_SECRET_KEY', 'dev-secret-key')
+    FRONTEND_ORIGIN = "http://localhost:3000"  # Adjust if you're serving the frontend locally
 
 class TestingConfig(Config):
     """Testing-specific configuration."""

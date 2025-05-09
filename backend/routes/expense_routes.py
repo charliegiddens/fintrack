@@ -80,7 +80,12 @@ def create_expense():
 @requires_auth
 def get_expense_by_id(expense_id): # expense_id is now a path parameter
     auth0_subject_id = g.current_user.get("sub")
-    fintrack_user_id = get_or_create_internal_user_id(auth0_subject_id)
+    email = g.current_user.get("email")
+    fintrack_user_id = get_or_create_internal_user_id(
+        auth0_subject_id,
+        email=email,
+        create_if_missing=True
+    )
 
     if not fintrack_user_id:
         return jsonify({"error": "Authenticated user not found in local database."}), 404
