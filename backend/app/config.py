@@ -1,6 +1,7 @@
 import os
 from dotenv import load_dotenv
 from urllib.parse import quote_plus, urlencode
+from .config_helpers import build_sqlalchemy_uri, build_redis_uri
 
 load_dotenv()
 
@@ -37,34 +38,12 @@ class StagingConfig:
     # Redis
     CACHE_TYPE = os.getenv("STAGING_CACHE_TYPE")
     CACHE_REDIS_SSL = os.getenv("STAGING_CACHE_REDIS_SSL")
-    CACHE_PROTOCOL = os.getenv("STAGING_CACHE_PROTOCOL")
     CACHE_DEFAULT_TIMEOUT = os.getenv("STAGING_CACHE_DEFAULT_TIMEOUT")
-    CACHE_ACCESS_KEY = os.getenv("STAGING_CACHE_ACCESS_KEY")
-    CACHE_SERVER = os.getenv("STAGING_CACHE_SERVER")
-    CACHE_PORT = os.getenv("STAGING_CACHE_PORT")
     ALGORITHMS = os.getenv("STAGING_CACHE_ALGORITHMS")
-
-    CACHE_REDIS_URL = (
-        f"{CACHE_PROTOCOL}://:{CACHE_ACCESS_KEY}@{CACHE_SERVER}:{CACHE_PORT}/0"
-        if all([CACHE_PROTOCOL, CACHE_ACCESS_KEY, CACHE_SERVER, CACHE_PORT])
-        else None
-    )
+    CACHE_REDIS_URL = build_redis_uri(os.getenv('STAGING_CACHE_CONN_URL'))
 
     # SQLAlchemy URI
-    DB_PROTOCOL = os.getenv('STAGING_DB_PROTOCOL')
-    DB_USER = os.getenv('STAGING_DB_USER')
-    DB_PASSWORD = quote_plus(os.getenv('STAGING_DB_PASSWORD', ''))
-    DB_SERVER = os.getenv('STAGING_DB_SERVER')
-    DB_PORT = os.getenv('STAGING_DB_PORT')
-    DB_DATABASE = os.getenv('STAGING_DB_DATABASE')
-    DB_DRIVER = os.getenv('STAGING_DB_DRIVER')
-    DB_QUERY = urlencode({'driver': DB_DRIVER, 'Encrypt': 'yes', 'TrustServerCertificate': 'no'})
-
-    SQLALCHEMY_DATABASE_URI = (
-        f"{DB_PROTOCOL}://{DB_USER}:{DB_PASSWORD}@{DB_SERVER}:{DB_PORT}/{DB_DATABASE}?{DB_QUERY}"
-        if all([DB_PROTOCOL, DB_USER, DB_PASSWORD, DB_SERVER, DB_PORT, DB_DATABASE, DB_DRIVER])
-        else None
-    )
+    SQLALCHEMY_DATABASE_URI = build_sqlalchemy_uri(os.getenv('STAGING_DB_CONN_URL'))
 
 
 class ProductionConfig(StagingConfig):
