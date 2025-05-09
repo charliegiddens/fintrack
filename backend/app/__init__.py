@@ -6,7 +6,7 @@ import os
 
 # import extensions
 from .extensions import db, cache
-from .config import Config, DevelopmentConfig, StagingConfig, ProductionConfig
+from .config import DevelopmentConfig, StagingConfig, ProductionConfig
 
 # import blueprints
 from routes.api_routes import api_bp
