@@ -59,8 +59,6 @@ def parse_redis_connection_string(redis_conn_str):
 
         # Return the components
         return host, port, password, options
-    else:
-        raise ValueError("Invalid Redis connection string format")
 
 def build_redis_uri(redis_conn_str):
     host, port, password, options = parse_redis_connection_string(redis_conn_str)
