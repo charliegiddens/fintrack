@@ -1,7 +1,6 @@
 from flask import Flask, jsonify
 from flask_cors import CORS
 from flask_migrate import Migrate
-import click
 from .auth_utils import AuthError
 import os
 
@@ -29,7 +28,7 @@ def create_app(config_class=None):
     cache.init_app(app) 
 
     # Set up Flask-Migrate
-    migrate = Migrate(app, db)
+    Migrate(app, db)
     
     # CORS
     CORS(
