@@ -90,14 +90,10 @@ def get_expense_by_id(expense_id): # expense_id is now a path parameter
     if not fintrack_user_id:
         return jsonify({"error": "Authenticated user not found in local database."}), 404
 
-    # --- Query for the specific expense belonging to the user ---
-    # We filter by both expense_id AND user_id for security.
-    expense = Expense.query.filter_by(id=expense_id).first()
+    # filter by both expense_id AND user_id for DB-layer security.
+    expense = Expense.query.filter_by(id=expense_id, user_id=fintrack_user_id).first()
 
     if expense:
-        if ( expense.to_dict()["user_id"] == fintrack_user_id ):
-            return jsonify(expense.to_dict()), 200
-        else:
-            return jsonify({"error": "Access denied."}), 401
-    elif not expense:
+        return jsonify(expense.to_dict()), 200
+    else:
         return jsonify({"error": "Expense not found."}), 404
