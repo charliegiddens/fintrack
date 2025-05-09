@@ -40,10 +40,10 @@ class StagingConfig:
     CACHE_REDIS_SSL = os.getenv("STAGING_CACHE_REDIS_SSL")
     CACHE_DEFAULT_TIMEOUT = os.getenv("STAGING_CACHE_DEFAULT_TIMEOUT")
     ALGORITHMS = os.getenv("STAGING_CACHE_ALGORITHMS")
-    CACHE_REDIS_URL = build_redis_uri(os.getenv('STAGING_CACHE_CONN_URL'))
+    CACHE_REDIS_URL = build_redis_uri(os.getenv('STAGING_CACHE_CONN_URL')) if os.getenv("STAGING_CACHE_CONN_URL") else None
 
     # SQLAlchemy URI
-    SQLALCHEMY_DATABASE_URI = build_sqlalchemy_uri(os.getenv('STAGING_DB_CONN_URL'))
+    SQLALCHEMY_DATABASE_URI = build_sqlalchemy_uri(os.getenv('STAGING_DB_CONN_URL')) if os.getenv("STAGING_DB_CONN_URL") else None
 
 
 class ProductionConfig(StagingConfig):
