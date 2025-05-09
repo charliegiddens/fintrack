@@ -2,9 +2,9 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { useAuth0 } from '@auth0/auth0-react';
 import ProtectedRoute from './ProtectedRoute';
-import PropTypes from 'prop-types'; // Import PropTypes if not already available globally in tests
+import PropTypes from 'prop-types';
 
-// Mock the useAuth0 hook
+// Mock useAuth0 hook
 jest.mock('@auth0/auth0-react', () => ({
     useAuth0: jest.fn(),
 }));
@@ -22,7 +22,7 @@ jest.mock('react-router-dom', () => {
     };
 });
 
-// Define a simple dummy component for testing
+// dummy component for testing
 const MockProtectedComponent = ({ extraProp }) => (
     <div>
         Protected Content {extraProp}

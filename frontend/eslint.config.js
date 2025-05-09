@@ -9,22 +9,22 @@ module.exports = defineConfig([
   {
     files: ['**/*.{js,mjs,cjs,jsx}'],
     languageOptions: {
-      parser: babelParser, // Use the imported parser object
+      parser: babelParser,
       parserOptions: {
         ecmaVersion: 'latest',
         sourceType: 'module',
         ecmaFeatures: {
-          jsx: true, // Enable JSX parsing
+          jsx: true,
         },
-        requireConfigFile: false, // Add this to avoid requiring a babel config file
+        requireConfigFile: false,
         babelOptions: {
-          presets: ['@babel/preset-react'], // Add React preset for JSX parsing
+          presets: ['@babel/preset-react'],
         },
       },
       globals: {
         ...globals.browser,
-        ...globals.node, // Add Node.js globals
-        process: 'readonly', // Add process explicitly
+        ...globals.node,
+        process: 'readonly',
         jest: 'readonly',
         describe: 'readonly',
         beforeEach: 'readonly',
@@ -53,7 +53,7 @@ module.exports = defineConfig([
     files: ['**/*.jsx', '**/*.js'],
     settings: {
       react: {
-        version: 'detect', // Automatically detect React version
+        version: 'detect',
       },
     },
   },

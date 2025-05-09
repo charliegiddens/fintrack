@@ -3,7 +3,7 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { useAuth0 } from '@auth0/auth0-react';
 import LogoutButton from './LogoutButton';
 
-// Mock the useAuth0 hook
+// Mock useAuth0 hook
 jest.mock('@auth0/auth0-react', () => ({
     useAuth0: jest.fn(),
 }));
@@ -15,9 +15,6 @@ describe('LogoutButton', () => {
         // Reset the mock before each test and provide the logout function
         useAuth0.mockReturnValue({
             logout: mockLogout,
-            // You might need isAuthenticated: true here if your LogoutButton
-            // was conditionally rendered based on authentication status,
-            // but based on the component code provided, it's not.
         });
     });
 
