@@ -40,10 +40,26 @@ class StagingConfig:
     CACHE_REDIS_SSL = os.getenv("STAGING_CACHE_REDIS_SSL")
     CACHE_DEFAULT_TIMEOUT = os.getenv("STAGING_CACHE_DEFAULT_TIMEOUT")
     ALGORITHMS = os.getenv("STAGING_CACHE_ALGORITHMS")
-    CACHE_REDIS_URL = build_redis_uri(os.getenv('STAGING_CACHE_CONN_URL')) if os.getenv("STAGING_CACHE_CONN_URL") else None
+
+    CACHE_USER = os.getenv("STAGING_CACHE_USER")
+    CACHE_PASS = os.getenv("STAGING_CACHE_PASS")
+    CACHE_HOST = os.getenv("STAGING_CACHE_HOST")
+    CACHE_PORT = os.getenv("STAGING_CACHE_PORT")
+    CACHE_REDIS_URL = (
+        f"redis://{CACHE_USER}:{CACHE_PASS}@{CACHE_HOST}:{CACHE_PORT}"
+        if all((CACHE_USER, CACHE_PASS, CACHE_HOST, CACHE_PORT)) else None
+    )
 
     # SQLAlchemy URI
-    SQLALCHEMY_DATABASE_URI = build_sqlalchemy_uri(os.getenv('STAGING_DB_CONN_URL')) if os.getenv("STAGING_DB_CONN_URL") else None
+    DB_USER = os.getenv("STAGING_DB_USER")
+    DB_PASS = os.getenv("STAGING_DB_PASS")
+    DB_HOST = os.getenv("STAGING_DB_HOST")
+    DB_PORT = os.getenv("STAGING_DB_PORT")
+    DB_NAME = os.getenv("STAGING_DB_NAME")
+    SQLALCHEMY_DATABASE_URI = (
+        f"postgresql://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}" 
+        if all((DB_USER, DB_PASS, DB_HOST, DB_PORT, DB_NAME)) else None
+    )
 
 
 class ProductionConfig(StagingConfig):
