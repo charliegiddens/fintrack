@@ -1,0 +1,36 @@
+name: Flask Backend CI - Dev
+
+on:
+  push:
+    branches: [dev]
+  pull_request:
+    branches: [dev]
+
+jobs:
+  backend-ci:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Install dependencies
+      working-directory: ./backend
+      run: |
+        pip install -r requirements.txt
+        pip install ruff pytest
+
+    - name: Lint with ruff
+      working-directory: ./backend
+      run: |
+        ruff check .
+
+    - name: Run unit tests (pytest)
+      working-directory: ./backend
+      run: |
+        pytest
