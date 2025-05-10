@@ -1,5 +1,4 @@
 from flask import Flask, jsonify
-from flask_cors import CORS
 from flask_migrate import Migrate
 from .auth_utils import AuthError
 import os
@@ -35,20 +34,6 @@ def create_app(config_class=None):
 
     # Set up Flask-Migrate
     Migrate(app, db)
-    
-    # CORS
-    CORS(
-        app,
-        resources={
-            r"/api/*": {
-                "origins": [
-                    app.config['FRONTEND_ORIGIN']
-                ],
-                "supports_credentials": True
-            }
-        }
-    )
-
 
     # blueprint registration
     app.register_blueprint(api_bp, url_prefix='/api')
