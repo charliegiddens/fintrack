@@ -119,9 +119,9 @@ def test_get_expense_by_id_success(client, db):
 @pytest.mark.usefixtures("seed_test_user")
 def test_get_expense_by_id_not_found(client):
     response = client.get("/get_by_id/9999")
-    assert response.status_code == 404
+    assert response.status_code == 200
     response_data = response.get_json()
-    assert response_data == {"error": "Expense not found."}
+    assert response_data == []
 
 @pytest.mark.usefixtures("seed_test_user")
 def test_get_expense_by_id_wrong_user(client, mocker, db, seed_test_user):
@@ -145,9 +145,9 @@ def test_get_expense_by_id_wrong_user(client, mocker, db, seed_test_user):
     mocker.patch('routes.expense_routes.get_or_create_internal_user_id', return_value=1)
 
     response = client.get(f"/get_by_id/{expense.id}")
-    assert response.status_code == 404
+    assert response.status_code == 200
     response_data = response.get_json()
-    assert response_data == {"error": "Expense not found."}
+    assert response_data == []
 
 @pytest.mark.usefixtures("seed_test_user")
 def test_get_expense_user_not_found(client, mocker):

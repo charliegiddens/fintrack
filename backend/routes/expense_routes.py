@@ -96,4 +96,25 @@ def get_expense_by_id(expense_id): # expense_id is now a path parameter
     if expense:
         return jsonify(expense.to_dict()), 200
     else:
-        return jsonify({"error": "Expense not found."}), 404
+        return jsonify([]), 200
+
+@expense_bp.route("/get_all", methods=['GET'])
+@requires_auth
+def get_all_expenses():
+    auth0_subject_id = g.current_user.get("sub")
+    email = g.current_user.get("email")
+    fintrack_user_id = get_or_create_internal_user_id(
+        auth0_subject_id,
+        email=email,
+        create_if_missing=True
+    )
+
+    if not fintrack_user_id:
+        return jsonify({"error": "Authenticated user not found in local database."}), 404
+
+    expenses = Expense.query.filter_by(user_id=fintrack_user_id).order_by(Expense.date.desc()).all()
+    if expenses:
+        return jsonify([e.to_dict() for e in expenses]), 200
+    else:
+        return jsonify([]), 200 
+    

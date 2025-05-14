@@ -22,16 +22,18 @@ function ExpensesPage() {
     const [isFetchingExpense, setIsFetchingExpense] = useState(false);
     const [fetchExpenseError, setFetchExpenseError] = useState(null);
 
+    // --- State for Fetching All Expenses ---
+    const [allExpenses, setAllExpenses] = useState([]);
+    const [isFetchingAllExpenses, setIsFetchingAllExpenses] = useState(false);
+    const [fetchAllExpensesError, setFetchAllExpensesError] = useState(null);
 
     useEffect(() => {
         if (!API_BASE_URL) {
             console.error("REACT_APP_API_BASE_URL is not defined in .env");
-            // Set a general error or handle as appropriate for the page
             setExpenseSubmitError("API endpoint not configured. Check frontend .env file.");
             setFetchExpenseError("API endpoint not configured. Check frontend .env file.");
         }
     }, []);
-
 
     // --- Handler for Creating Expense ---
     const handleExpenseSubmit = async (event) => {
@@ -62,7 +64,7 @@ function ExpensesPage() {
                 date: expenseDate ? new Date(expenseDate).toISOString() : new Date().toISOString(),
             };
 
-            const response = await axios.post(`${API_BASE_URL}/expenses/create`, expenseData, { // Assuming '/expenses' is the POST endpoint
+            const response = await axios.post(`${API_BASE_URL}/expenses/create`, expenseData, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                     'Content-Type': 'application/json',
@@ -131,6 +133,41 @@ function ExpensesPage() {
         }
     };
 
+    // --- Handler for Fetching All Expenses ---
+    const handleFetchAllExpenses = async () => {
+        if (!isAuthenticated) {
+            setFetchAllExpensesError("Please log in to fetch expenses.");
+            return;
+        }
+        if (!API_BASE_URL) {
+            setFetchAllExpensesError("API endpoint not configured.");
+            return;
+        }
+
+        setIsFetchingAllExpenses(true);
+        setFetchAllExpensesError(null);
+        setAllExpenses([]);
+
+        try {
+            const token = await getAccessTokenSilently();
+            const response = await axios.get(`${API_BASE_URL}/expenses/get_all`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            setAllExpenses(response.data || []);
+        } catch (error) {
+            console.error('Error fetching all expenses:', error);
+            setFetchAllExpensesError(
+                error.response?.data?.error ||
+                error.response?.data?.message ||
+                error.message ||
+                "Failed to fetch expenses."
+            );
+        } finally {
+            setIsFetchingAllExpenses(false);
+        }
+    };
 
     if (authLoading) {
         return <div className="page-loading">Loading authentication...</div>;
@@ -231,6 +268,25 @@ function ExpensesPage() {
                     <div style={{ marginTop: '15px', border: '1px solid #eee', padding: '10px', backgroundColor: '#f9f9f9' }}>
                         <h4>Fetched Expense Details:</h4>
                         <pre>{JSON.stringify(fetchedExpense, null, 2)}</pre>
+                    </div>
+                )}
+            </div>
+
+            {/* --- Section for Fetching All Expenses --- */}
+            <div className="fetch-all-expenses-section" style={{ marginTop: '30px', border: '1px solid #ddd', padding: '20px', borderRadius: '8px' }}>
+                <h3>All Expenses</h3>
+                <button onClick={handleFetchAllExpenses} disabled={isFetchingAllExpenses || authLoading} style={{ padding: '10px 15px' }}>
+                    {isFetchingAllExpenses ? 'Loading...' : 'Fetch All Expenses'}
+                </button>
+
+                {fetchAllExpensesError && (
+                    <p style={{ color: 'red', marginTop: '10px' }}>Error: {fetchAllExpensesError}</p>
+                )}
+
+                {allExpenses.length > 0 && (
+                    <div style={{ marginTop: '15px', border: '1px solid #eee', padding: '10px', backgroundColor: '#f0f8ff' }}>
+                        <h4>All Expenses:</h4>
+                        <pre>{JSON.stringify(allExpenses, null, 2)}</pre>
                     </div>
                 )}
             </div>

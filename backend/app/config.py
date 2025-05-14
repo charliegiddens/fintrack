@@ -8,12 +8,12 @@ class DevelopmentConfig:
     TESTING = False
     SECRET_KEY = os.getenv('DEV_APP_SECRET_KEY')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    FRONTEND_ORIGIN = os.getenv('DEV_FRONTEND_ORIGIN')
     SQLALCHEMY_DATABASE_URI = os.getenv("DEV_DB_URI")
 
     # Redis
     CACHE_TYPE = os.getenv("DEV_CACHE_TYPE")
-    CACHE_DEFAULT_TIMEOUT = 300
+    CACHE_DEFAULT_TIMEOUT = int(os.getenv("DEV_CACHE_DEFAULT_TIMEOUT"))
+    ALGORITHMS = os.getenv("DEV_CACHE_ALGORITHMS")
 
     # Auth0
     AUTH0_CLIENT_ID = os.getenv('DEV_AUTH0_CLIENT_ID')
