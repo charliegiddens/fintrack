@@ -12,7 +12,7 @@ class DevelopmentConfig:
 
     # Redis
     CACHE_TYPE = os.getenv("DEV_CACHE_TYPE")
-    CACHE_DEFAULT_TIMEOUT = int(os.getenv("DEV_CACHE_DEFAULT_TIMEOUT"))
+    CACHE_DEFAULT_TIMEOUT = int(os.getenv("DEV_CACHE_DEFAULT_TIMEOUT"), 300)
     ALGORITHMS = os.getenv("DEV_CACHE_ALGORITHMS")
 
     # Auth0
