@@ -64,7 +64,7 @@ jobs:
 
       - name: Start Cloud SQL Proxy
         run: |
-          ./cloud_sql_proxy -instances="${{ env.CLOUD_SQL_CONNECTION_NAME }}=tcp:0.0.0.0:5432" &
+          ./cloud_sql_proxy -instances="${{ env.CLOUD_SQL_CONNECTION_NAME }}=tcp:127.0.0.1:3306" &
           echo "Cloud SQL Proxy started in the background"
           sleep 5 # Give the proxy a moment to start
 
@@ -84,7 +84,7 @@ jobs:
         working-directory: ./backend
         run: |
           echo "FLASK_ENV=development" >> $GITHUB_ENV
-          echo "DEV_DB_URI=postgresql://${{ secrets.CLOUD_SQL_USERNAME_DEV }}:${{ secrets.CLOUD_SQL_PASSWORD_DEV }}@127.0.0.1:5432/${{ secrets.CLOUD_SQL_DATABASE_DEV }}" >> $GITHUB_ENV
+          echo "DEV_DB_URI=mysql://${{ secrets.CLOUD_SQL_USERNAME_DEV }}:${{ secrets.CLOUD_SQL_PASSWORD_DEV }}@127.0.0.1:3306/${{ secrets.CLOUD_SQL_DATABASE_DEV }}" >> $GITHUB_ENV
 
       - name: Run Flask Migrations
         working-directory: ./backend
