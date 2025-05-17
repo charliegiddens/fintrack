@@ -114,30 +114,33 @@ jobs:
       
       - name: Deploy to Cloud Run (Dev Environment)
         run: |  
+
+          SECRETS_CONFIG="DEV_APP_SECRET_KEY=dev_app_secret_key:latest"
+          SECRETS_CONFIG="${SECRETS_CONFIG},DEV_AUTH0_CLIENT_ID=dev_auth0_client_id:latest"
+          SECRETS_CONFIG="${SECRETS_CONFIG},DEV_AUTH0_CLIENT_SECRET=dev_auth0_client_secret:latest"
+          SECRETS_CONFIG="${SECRETS_CONFIG},DEV_AUTH0_DOMAIN=dev_auth0_domain:latest"
+          SECRETS_CONFIG="${SECRETS_CONFIG},DEV_AUTH0_API_AUDIENCE=dev_auth0_api_audience:latest"
+          SECRETS_CONFIG="${SECRETS_CONFIG},DEV_CACHE_TYPE=dev_cache_type:latest"
+          SECRETS_CONFIG="${SECRETS_CONFIG},DEV_CACHE_REDIS_SSL=dev_cache_redis_ssl:latest"
+          SECRETS_CONFIG="${SECRETS_CONFIG},DEV_CACHE_DEFAULT_TIMEOUT=dev_cache_default_timeout:latest"
+          SECRETS_CONFIG="${SECRETS_CONFIG},DEV_CACHE_ALGORITHMS=dev_cache_algorithms:latest"
+          SECRETS_CONFIG="${SECRETS_CONFIG},DEV_CACHE_USER=dev_cache_user:latest"
+          SECRETS_CONFIG="${SECRETS_CONFIG},DEV_CACHE_PASS=dev_cache_pass:latest"
+          SECRETS_CONFIG="${SECRETS_CONFIG},DEV_CACHE_HOST=dev_cache_host:latest"
+          SECRETS_CONFIG="${SECRETS_CONFIG},DEV_CACHE_PORT=dev_cache_port:latest"
+          SECRETS_CONFIG="${SECRETS_CONFIG},DEV_DB_USER=dev_db_user:latest"
+          SECRETS_CONFIG="${SECRETS_CONFIG},DEV_DB_PASS=dev_db_pass:latest"
+          SECRETS_CONFIG="${SECRETS_CONFIG},DEV_DB_HOST=dev_db_host:latest"
+          SECRETS_CONFIG="${SECRETS_CONFIG},DEV_DB_PORT=dev_db_port:latest"
+          SECRETS_CONFIG="${SECRETS_CONFIG},DEV_DB_NAME=dev_db_name:latest"
+
           gcloud run deploy fintrack-dev \
             --image "${{ env.DOCKER_IMAGE }}" \
             --region europe-west1 \                 
             --project "${{ secrets.GCP_PROJECT_ID }}" \
             --platform managed \
             --allow-unauthenticated \ 
-            --update-secrets "DEV_APP_SECRET_KEY=dev_app_secret_key:latest" \
-            --update-secrets "DEV_AUTH0_CLIENT_ID=dev_auth0_client_id:latest" \
-            --update-secrets "DEV_AUTH0_CLIENT_SECRET=dev_auth0_client_secret:latest" \
-            --update-secrets "DEV_AUTH0_DOMAIN=dev_auth0_domain:latest" \
-            --update-secrets "DEV_AUTH0_API_AUDIENCE=dev_auth0_api_audience:latest" \
-            --update-secrets "DEV_CACHE_TYPE=dev_cache_type:latest" \
-            --update-secrets "DEV_CACHE_REDIS_SSL=dev_cache_redis_ssl:latest" \
-            --update-secrets "DEV_CACHE_DEFAULT_TIMEOUT=dev_cache_default_timeout:latest" \
-            --update-secrets "DEV_CACHE_ALGORITHMS=dev_cache_algorithms:latest" \
-            --update-secrets "DEV_CACHE_USER=dev_cache_user:latest" \
-            --update-secrets "DEV_CACHE_PASS=dev_cache_pass:latest" \
-            --update-secrets "DEV_CACHE_HOST=dev_cache_host:latest" \
-            --update-secrets "DEV_CACHE_PORT=dev_cache_port:latest" \
-            --update-secrets "DEV_DB_USER=dev_db_user:latest" \
-            --update-secrets "DEV_DB_PASS=dev_db_pass:latest" \
-            --update-secrets "DEV_DB_HOST=dev_db_host:latest" \
-            --update-secrets "DEV_DB_PORT=dev_db_port:latest" \
-            --update-secrets "DEV_DB_NAME=dev_db_name:latest" \
+            --update-secrets "${SECRETS_CONFIG}" \
             --quiet 
 
       - name: Stop Cloud SQL Proxy
