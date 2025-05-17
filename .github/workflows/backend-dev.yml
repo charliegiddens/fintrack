@@ -51,6 +51,10 @@ jobs:
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v2
 
+      - name: Configure Docker
+        run: |
+          gcloud auth configure-docker europe-west1-docker.pkg.dev
+
       - name: Get Cloud SQL Connection Name
         run: |
           INSTANCE_ID=$(echo "${{ secrets.CLOUD_SQL_INSTANCE_ID_DEV }}" | cut -d':' -f3)
@@ -90,6 +94,17 @@ jobs:
         working-directory: ./backend
         run: |
           flask db upgrade
+
+      - name: Build Docker Image
+        working-directory: ./backend
+        run: |
+          echo "ENVIRONMENT=dev" >> $GITHUB_ENV
+          docker build -t europe-west1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/fintrack-ar-dev-weu:${{ env.ENVIRONMENT }}-${GITHUB_SHA::8} .
+          echo "DOCKER_IMAGE=europe-west1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/fintrack-ar-dev-weu:${{ env.ENVIRONMENT }}-${GITHUB_SHA::8}" >> $GITHUB_ENV
+
+      - name: Push Docker Image to Artifact Registry
+        run: |
+          docker push ${{ env.DOCKER_IMAGE }}
 
       - name: Stop Cloud SQL Proxy
         run: |
