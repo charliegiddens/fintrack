@@ -8,12 +8,32 @@ class DevelopmentConfig:
     TESTING = False
     SECRET_KEY = os.getenv('DEV_APP_SECRET_KEY')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    SQLALCHEMY_DATABASE_URI = os.getenv("DEV_DB_URI")
 
     # Redis
-    CACHE_TYPE = os.getenv("DEV_CACHE_TYPE", "SimpleCache")
-    CACHE_DEFAULT_TIMEOUT = int(os.getenv("DEV_CACHE_DEFAULT_TIMEOUT", 300))
-    ALGORITHMS = os.getenv("DEV_CACHE_ALGORITHMS", ["RS256"])
+    CACHE_TYPE = os.getenv("DEV_CACHE_TYPE")
+    CACHE_REDIS_SSL = os.getenv("DEV_CACHE_REDIS_SSL")
+    CACHE_DEFAULT_TIMEOUT = os.getenv("DEV_CACHE_DEFAULT_TIMEOUT")
+    ALGORITHMS = os.getenv("DEV_CACHE_ALGORITHMS")
+
+    CACHE_USER = os.getenv("DEV_CACHE_USER")
+    CACHE_PASS = os.getenv("DEV_CACHE_PASS")
+    CACHE_HOST = os.getenv("DEV_CACHE_HOST")
+    CACHE_PORT = os.getenv("DEV_CACHE_PORT")
+    CACHE_REDIS_URL = (
+        f"redis://{CACHE_USER}:{CACHE_PASS}@{CACHE_HOST}:{CACHE_PORT}"
+        if all((CACHE_USER, CACHE_PASS, CACHE_HOST, CACHE_PORT)) else None
+    )
+
+    # SQLAlchemy URI
+    DB_USER = os.getenv("DEV_DB_USER")
+    DB_PASS = os.getenv("DEV_DB_PASS")
+    DB_HOST = os.getenv("DEV_DB_HOST")
+    DB_PORT = os.getenv("DEV_DB_PORT")
+    DB_NAME = os.getenv("DEV_DB_NAME")
+    SQLALCHEMY_DATABASE_URI = (
+        f"mysql://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}" 
+        if all((DB_USER, DB_PASS, DB_HOST, DB_PORT, DB_NAME)) else None
+    )
 
     # Auth0
     AUTH0_CLIENT_ID = os.getenv('DEV_AUTH0_CLIENT_ID')
@@ -56,7 +76,7 @@ class StagingConfig:
     DB_PORT = os.getenv("STAGING_DB_PORT")
     DB_NAME = os.getenv("STAGING_DB_NAME")
     SQLALCHEMY_DATABASE_URI = (
-        f"postgresql://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}" 
+        f"mysql://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}" 
         if all((DB_USER, DB_PASS, DB_HOST, DB_PORT, DB_NAME)) else None
     )
 
