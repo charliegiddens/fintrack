@@ -10,19 +10,19 @@ class DevelopmentConfig:
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     # Redis
-    CACHE_TYPE = os.getenv("DEV_CACHE_TYPE")
-    CACHE_REDIS_SSL = os.getenv("DEV_CACHE_REDIS_SSL")
-    CACHE_DEFAULT_TIMEOUT = os.getenv("DEV_CACHE_DEFAULT_TIMEOUT")
-    ALGORITHMS = os.getenv("DEV_CACHE_ALGORITHMS")
-
-    CACHE_USER = os.getenv("DEV_CACHE_USER")
-    CACHE_PASS = os.getenv("DEV_CACHE_PASS")
-    CACHE_HOST = os.getenv("DEV_CACHE_HOST")
-    CACHE_PORT = os.getenv("DEV_CACHE_PORT")
-    CACHE_REDIS_URL = (
-        f"redis://{CACHE_USER}:{CACHE_PASS}@{CACHE_HOST}:{CACHE_PORT}"
-        if all((CACHE_USER, CACHE_PASS, CACHE_HOST, CACHE_PORT)) else None
-    )
+    CACHE_TYPE = os.getenv("DEV_CACHE_TYPE", "SimpleCache")
+    CACHE_REDIS_SSL = os.getenv("DEV_CACHE_REDIS_SSL", False)
+    CACHE_DEFAULT_TIMEOUT = int(os.getenv("DEV_CACHE_DEFAULT_TIMEOUT", 300))
+    ALGORITHMS = os.getenv("DEV_CACHE_ALGORITHMS", ["RS256"])
+    if not (CACHE_TYPE == "SimpleCache"):
+        CACHE_USER = os.getenv("DEV_CACHE_USER")
+        CACHE_PASS = os.getenv("DEV_CACHE_PASS")
+        CACHE_HOST = os.getenv("DEV_CACHE_HOST")
+        CACHE_PORT = os.getenv("DEV_CACHE_PORT")
+        CACHE_REDIS_URL = (
+            f"redis://{CACHE_USER}:{CACHE_PASS}@{CACHE_HOST}:{CACHE_PORT}"
+            if all((CACHE_USER, CACHE_PASS, CACHE_HOST, CACHE_PORT)) else None
+        )
 
     # SQLAlchemy URI
     DB_USER = os.getenv("DEV_DB_USER")
