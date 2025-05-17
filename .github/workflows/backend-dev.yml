@@ -53,7 +53,8 @@ jobs:
 
       - name: Get Cloud SQL Connection Name
         run: |
-          INSTANCE_CONNECTION_NAME=$(gcloud sql instances describe ${{ secrets.CLOUD_SQL_INSTANCE_ID_DEV }} --project ${{ secrets.GCP_PROJECT_ID }} --format='value(connectionName)')
+          INSTANCE_ID=$(echo "${{ secrets.CLOUD_SQL_INSTANCE_ID_DEV }}" | cut -d':' -f3)
+          INSTANCE_CONNECTION_NAME=$(gcloud sql instances describe "$INSTANCE_ID" --project "${{ secrets.GCP_PROJECT_ID }}" --format='value(connectionName)')
           echo "CLOUD_SQL_CONNECTION_NAME=$INSTANCE_CONNECTION_NAME" >> $GITHUB_ENV
 
       - name: Install Cloud SQL Proxy
