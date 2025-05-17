@@ -11,9 +11,9 @@ class DevelopmentConfig:
     SQLALCHEMY_DATABASE_URI = os.getenv("DEV_DB_URI")
 
     # Redis
-    CACHE_TYPE = os.getenv("DEV_CACHE_TYPE")
+    CACHE_TYPE = os.getenv("DEV_CACHE_TYPE", "SimpleCache")
     CACHE_DEFAULT_TIMEOUT = int(os.getenv("DEV_CACHE_DEFAULT_TIMEOUT", 300))
-    ALGORITHMS = os.getenv("DEV_CACHE_ALGORITHMS")
+    ALGORITHMS = os.getenv("DEV_CACHE_ALGORITHMS", ["RS256"])
 
     # Auth0
     AUTH0_CLIENT_ID = os.getenv('DEV_AUTH0_CLIENT_ID')
