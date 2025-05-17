@@ -92,3 +92,7 @@ jobs:
       - name: Push Docker Image to Artifact Registry
         run: |
           docker --debug push ${{ env.DOCKER_IMAGE }}
+      - name: Stop Cloud SQL Proxy
+        run: |
+          pkill -f cloud_sql_proxy
+          sleep
