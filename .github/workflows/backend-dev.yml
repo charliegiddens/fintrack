@@ -95,4 +95,4 @@ jobs:
       - name: Stop Cloud SQL Proxy
         run: |
           pkill -f cloud_sql_proxy
-          sleep
+          sleep 2
