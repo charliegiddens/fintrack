@@ -98,7 +98,7 @@ jobs:
         id: deploy
         uses: google-github-actions/deploy-cloudrun@v2.7.3
         with:
-          service: fintrack-dev-backend
+          service: fintrack-dev
           region: europe-west1
           image: ${{ env.DOCKER_IMAGE }}
           flags: |
