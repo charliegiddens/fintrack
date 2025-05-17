@@ -13,4 +13,3 @@ venv/
 
 # database files
 *.db
-migrations/
