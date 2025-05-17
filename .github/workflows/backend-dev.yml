@@ -98,9 +98,8 @@ jobs:
       - name: Build Docker Image
         working-directory: ./backend
         run: |
-          echo "ENVIRONMENT=dev" >> $GITHUB_ENV
-          docker build -t europe-west1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/fintrack-ar-dev-weu:${{ env.ENVIRONMENT }}-${GITHUB_SHA::8} .
-          echo "DOCKER_IMAGE=europe-west1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/fintrack-ar-dev-weu:${{ env.ENVIRONMENT }}-${GITHUB_SHA::8}" >> $GITHUB_ENV
+          docker build -t europe-west1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/fintrack-ar-dev-weu:${GITHUB_SHA::8} .
+          echo "DOCKER_IMAGE=europe-west1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/fintrack-ar-dev-weu:${GITHUB_SHA::8}" >> $GITHUB_ENV
 
       - name: Push Docker Image to Artifact Registry
         run: |
