@@ -71,9 +71,7 @@ jobs:
 
       - name: Start Cloud SQL Proxy
         run: |
-          ./cloud_sql_proxy -instances="${{ env.CLOUD_SQL_CONNECTION_NAME }}=tcp:127.0.0.1:3306" &
-          echo "Cloud SQL Proxy started in the background"
-          sleep 5 # Give the proxy a moment to start
+          ./cloud_sql_proxy -instances="${{ env.CLOUD_SQL_CONNECTION_NAME }}=tcp:127.0.0.1:3306"
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -91,12 +89,20 @@ jobs:
         working-directory: ./backend
         run: |
           echo "FLASK_ENV=development" >> $GITHUB_ENV
-          echo "DEV_DB_URI=mysql://${{ secrets.CLOUD_SQL_USERNAME_DEV }}:${{ secrets.CLOUD_SQL_PASSWORD_DEV }}@127.0.0.1:3306/${{ secrets.CLOUD_SQL_DATABASE_DEV }}" >> $GITHUB_ENV
+          echo "DEV_DB_USER=${{ secrets.CLOUD_SQL_USERNAME_DEV }}" >> $GITHUB_ENV
+          echo "DEV_DB_PASS=${{ secrets.CLOUD_SQL_PASSWORD_DEV }}" >> $GITHUB_ENV
+          echo "DEV_DB_HOST=127.0.0.1" >> $GITHUB_ENV
+          echo "DEV_DB_PORT=3306" >> $GITHUB_ENV
+          echo "DEV_DB_NAME=${{ secrets.CLOUD_SQL_DATABASE_DEV }}" >> $GITHUB_ENV
 
       - name: Run Flask Migrations
         working-directory: ./backend
         run: |
           flask db upgrade
+
+      - name: Stop Cloud SQL Proxy
+        run: |
+          pkill cloud_sql_proxy
 
       - name: Build Docker Image
         working-directory: ./backend
@@ -107,7 +113,3 @@ jobs:
       - name: Push Docker Image to Artifact Registry
         run: |
           docker --debug push ${{ env.DOCKER_IMAGE }}
-
-      - name: Stop Cloud SQL Proxy
-        run: |
-          pkill cloud_sql_proxy
