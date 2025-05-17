@@ -37,6 +37,7 @@ jobs:
   
   backend-cd:
     runs-on: ubuntu-latest
+    environment: dev
     needs: backend-ci
     steps:
       - name: Checkout code
