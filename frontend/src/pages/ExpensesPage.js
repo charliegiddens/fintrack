@@ -11,7 +11,7 @@ function ExpensesPage() {
     const [expenseDescription, setExpenseDescription] = useState('');
     const [expenseAmount, setExpenseAmount] = useState('');
     const [expenseCategory, setExpenseCategory] = useState('');
-    const [expenseDate, setExpenseDate] = useState(new Date().toISOString().split('T')[0]);
+    const [expenseDate, setExpenseDate] = useState(new Date().toISOString().slice(0, 16));
     const [isSubmittingExpense, setIsSubmittingExpense] = useState(false);
     const [expenseSubmitError, setExpenseSubmitError] = useState(null);
     const [expenseSubmitSuccess, setExpenseSubmitSuccess] = useState(null);
@@ -189,7 +189,7 @@ function ExpensesPage() {
                     <div>
                         <label htmlFor="expenseDate">Date:</label>
                         <input
-                            type="date"
+                            type="datetime-local"
                             id="expenseDate"
                             value={expenseDate}
                             onChange={(e) => setExpenseDate(e.target.value)}
