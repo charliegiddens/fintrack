@@ -1,0 +1,30 @@
+services:
+  mysql:
+    image: mysql:latest
+    env_file:
+      - ./mysql.env
+    volumes:
+      - ./mysql-data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+
+  backend:
+    build:
+      context: ./backend
+    ports:
+      - "8000:8000"
+    depends_on:
+      - mysql
+    env_file:
+      - ./backend/.env
+    volumes:
+      - ./backend:/app
+
+  frontend:
+    build:
+      context: ./frontend
+    ports:
+      - "3000:80"       # expose container's port 80 on host 3000
+    depends_on:
+      - backend
+

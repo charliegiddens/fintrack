@@ -1,7 +1,7 @@
 from flask import Flask, jsonify
+from flask_cors import CORS
 from flask_migrate import Migrate
 from .auth_utils import AuthError
-import os
 
 # import extensions
 from .extensions import db, cache
@@ -14,6 +14,9 @@ from routes.expense_routes import expense_bp
 # application factory func
 def create_app(config_class=None):
     app = Flask(__name__)
+
+    # CORS setup
+    CORS(app, origins=["http://localhost:3000", "http://host.docker.internal:3000"])
 
     # load config
     app.config.from_object(Config)

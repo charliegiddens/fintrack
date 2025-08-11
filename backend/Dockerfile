@@ -15,6 +15,7 @@ WORKDIR /app
 #   - default-libmysqlclient-dev: development files for MySQL client (needed by mysqlclient python package)
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
+    netcat-traditional \
     libpq-dev \
     curl \
     pkg-config \
@@ -34,4 +35,4 @@ COPY . .
 EXPOSE 8000
 
 # Upgrade DB schema and start app
-CMD ["sh", "-c", "flask db upgrade && waitress-serve --host=0.0.0.0 --port=8000 wsgi:app"]
+CMD ["sh", "-c", "until nc -z mysql 3306; do echo 'Waiting for MySQL...'; sleep 3; done && flask db upgrade && waitress-serve --host=0.0.0.0 --port=8000 wsgi:app"]
