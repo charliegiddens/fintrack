@@ -4,15 +4,14 @@ from dotenv import load_dotenv
 load_dotenv()
 
 class Config:
-    TESTING = False
-    SECRET_KEY = os.getenv('APP_SECRET_KEY')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    SECRET_KEY = os.getenv('APP_SECRET_KEY')
 
     # Redis
     CACHE_PROTOCOL = os.getenv("CACHE_PROTOCOL")
     CACHE_TYPE = os.getenv("CACHE_TYPE")
     CACHE_REDIS_SSL = os.getenv("CACHE_REDIS_SSL")
-    CACHE_DEFAULT_TIMEOUT = int(os.getenv("CACHE_DEFAULT_TIMEOUT"))
+    CACHE_DEFAULT_TIMEOUT = int(os.getenv("CACHE_DEFAULT_TIMEOUT", 300))
     ALGORITHMS = os.getenv("CACHE_ALGORITHMS")
     CACHE_USER = os.getenv("CACHE_USER")
     CACHE_PASS = os.getenv("CACHE_PASS")
@@ -42,7 +41,6 @@ class Config:
     AUTH0_API_AUDIENCE = os.getenv('AUTH0_API_AUDIENCE')
 
 class TestingConfig:
-    TESTING = True
     DEBUG = True
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_DATABASE_URI = "sqlite:///:memory:"
