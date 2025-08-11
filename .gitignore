@@ -1,12 +1,2 @@
-# Node.js
-node_modules/
-
-# Python
-venv/
-*.pyc
-
-# VS Code
-.vscode/
-
-# Environment variables
-.env
+mysql.env
+mysql-data/

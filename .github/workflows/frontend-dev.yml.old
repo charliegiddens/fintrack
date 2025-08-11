@@ -1,0 +1,40 @@
+name: Frontend CI - Dev
+
+on:
+  push:
+    branches: [dev]
+  pull_request:
+    branches: [dev]
+
+jobs:
+  frontend-ci:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '22'
+
+    - name: Install dependencies
+      working-directory: ./frontend
+      run: |
+        npm install
+
+    - name: Lint with ESLint
+      working-directory: ./frontend
+      run: |
+        npx eslint src/ --max-warnings 0 
+
+    - name: Run tests with Jest
+      working-directory: ./frontend
+      run: |
+        npm test -- --ci --runInBand
+
+    - name: Build the app
+      working-directory: ./frontend
+      run: |
+        npm run build

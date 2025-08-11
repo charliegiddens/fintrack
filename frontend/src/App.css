@@ -1,0 +1,34 @@
+/* frontend/src/App.css */
+.app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.app-nav {
+  background-color: #333;
+  padding: 10px 20px;
+  display: flex;
+  align-items: center;
+  color: white;
+}
+
+.app-nav .nav-link {
+  color: white;
+  text-decoration: none;
+  margin-right: 15px;
+  font-size: 1.1em;
+}
+
+.app-nav .nav-link:hover {
+  text-decoration: underline;
+}
+
+.app-nav .auth-buttons {
+  margin-left: auto; /* Pushes auth buttons to the right */
+}
+
+.app-content {
+  flex-grow: 1;
+  padding: 20px;
+}
