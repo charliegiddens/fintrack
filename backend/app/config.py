@@ -41,46 +41,6 @@ class DevelopmentConfig:
     AUTH0_DOMAIN = os.getenv('DEV_AUTH0_DOMAIN')
     AUTH0_API_AUDIENCE = os.getenv('DEV_AUTH0_API_AUDIENCE')
 
-
-class StagingConfig:
-    TESTING = False
-    SECRET_KEY = os.getenv('STAGING_APP_SECRET_KEY')
-    SQLALCHEMY_TRACK_MODIFICATIONS = False
-    FRONTEND_ORIGIN = os.getenv('STAGING_FRONTEND_ORIGIN')
-
-    # Auth0
-    AUTH0_CLIENT_ID = os.getenv('STAGING_AUTH0_CLIENT_ID')
-    AUTH0_CLIENT_SECRET = os.getenv('STAGING_AUTH0_CLIENT_SECRET')
-    AUTH0_DOMAIN = os.getenv('STAGING_AUTH0_DOMAIN')
-    AUTH0_API_AUDIENCE = os.getenv('STAGING_AUTH0_API_AUDIENCE')
-
-    # Redis
-    CACHE_TYPE = os.getenv("STAGING_CACHE_TYPE")
-    CACHE_REDIS_SSL = os.getenv("STAGING_CACHE_REDIS_SSL")
-    CACHE_DEFAULT_TIMEOUT = os.getenv("STAGING_CACHE_DEFAULT_TIMEOUT")
-    ALGORITHMS = os.getenv("STAGING_CACHE_ALGORITHMS")
-
-    CACHE_USER = os.getenv("STAGING_CACHE_USER")
-    CACHE_PASS = os.getenv("STAGING_CACHE_PASS")
-    CACHE_HOST = os.getenv("STAGING_CACHE_HOST")
-    CACHE_PORT = os.getenv("STAGING_CACHE_PORT")
-    CACHE_REDIS_URL = (
-        f"redis://{CACHE_USER}:{CACHE_PASS}@{CACHE_HOST}:{CACHE_PORT}"
-        if all((CACHE_USER, CACHE_PASS, CACHE_HOST, CACHE_PORT)) else None
-    )
-
-    # SQLAlchemy URI
-    DB_USER = os.getenv("STAGING_DB_USER")
-    DB_PASS = os.getenv("STAGING_DB_PASS")
-    DB_HOST = os.getenv("STAGING_DB_HOST")
-    DB_PORT = os.getenv("STAGING_DB_PORT")
-    DB_NAME = os.getenv("STAGING_DB_NAME")
-    SQLALCHEMY_DATABASE_URI = (
-        f"mysql://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}" 
-        if all((DB_USER, DB_PASS, DB_HOST, DB_PORT, DB_NAME)) else None
-    )
-
-
 class ProductionConfig(StagingConfig):
     """Same structure as staging, just reads from PROD_ vars."""
 

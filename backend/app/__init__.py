@@ -20,12 +20,10 @@ def create_app(config_class=None):
         case "development":
             app.config.from_object(DevelopmentConfig)
             app.debug = True
-        case "staging":
-            app.config.from_object(StagingConfig)
         case "production":
             app.config.from_object(ProductionConfig)
         case _:
-            raise RuntimeError("FLASK_ENV must be set to 'development', 'staging', or 'production'") 
+            raise RuntimeError("FLASK_ENV must be set to 'development' or 'production'") 
         
 
     # initialise extensions
