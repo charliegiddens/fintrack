@@ -5,7 +5,7 @@ import os
 
 # import extensions
 from .extensions import db, cache
-from .config import DevelopmentConfig, StagingConfig, ProductionConfig
+from .config import Config
 
 # import blueprints
 from routes.api_routes import api_bp
@@ -15,16 +15,8 @@ from routes.expense_routes import expense_bp
 def create_app(config_class=None):
     app = Flask(__name__)
 
-    # Select appropriate config per flask environment
-    match os.getenv("FLASK_ENV"):
-        case "development":
-            app.config.from_object(DevelopmentConfig)
-            app.debug = True
-        case "production":
-            app.config.from_object(ProductionConfig)
-        case _:
-            raise RuntimeError("FLASK_ENV must be set to 'development' or 'production'") 
-        
+    # load config
+    app.config.from_object(Config)
 
     # initialise extensions
     db.init_app(app)
