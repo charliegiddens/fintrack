@@ -17,11 +17,15 @@ def sample_user(db):
 
 def test_create_expense(db, sample_user):
     """Test creating a new Expense instance."""
+
+    created_at_time = datetime.datetime.now(timezone.utc).replace(microsecond=0)
     expense_data = {
         "user_id": sample_user.id,
         "description": "Groceries",
-        "amount": Decimal("75.50"), # Use Decimal for Numeric fields
-        "category": "Food"
+        "amount": Decimal("75.50"), # Decimal for Numeric fields
+        "category": "Food",
+        "created_at": created_at_time
+
     }
     expense = Expense(**expense_data)
     db.session.add(expense)
@@ -33,7 +37,9 @@ def test_create_expense(db, sample_user):
     assert expense.amount == Decimal("75.50")
     assert expense.category == "Food"
     assert expense.date is not None # Should have default date
+    assert expense.created_at is not None # Should have default date
     assert isinstance(expense.date, datetime.datetime)
+    assert isinstance(expense.created_at, datetime.datetime)
 
 def test_expense_repr(db, sample_user):
     """Test the __repr__ method of Expense."""
@@ -57,7 +63,8 @@ def test_expense_to_dict(db, sample_user):
         date=aware_insert_time, # Insert aware datetime
         description="Software Subscription",
         amount=Decimal("19.99"),
-        category="Software"
+        category="Software",
+        created_at=aware_insert_time
     )
     db.session.add(expense_to_insert)
     db.session.commit()
@@ -72,7 +79,8 @@ def test_expense_to_dict(db, sample_user):
         'date': expected_naive_iso_date_string,
         'description': "Software Subscription",
         'amount': Decimal("19.99"),
-        'category': "Software"
+        'category': "Software",
+        'created_at': expected_naive_iso_date_string
     }
 
     assert actual_dict == expected_dict
