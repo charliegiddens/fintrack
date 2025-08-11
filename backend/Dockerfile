@@ -31,7 +31,7 @@ RUN pip install --no-cache-dir --upgrade pip && \
 COPY . .
 
 # Expose port
-EXPOSE 8080
+EXPOSE 8000
 
-# Command to run app (adjust if using Gunicorn)
-CMD ["gunicorn", "wsgi:app", "-b", "0.0.0.0:8080"]
+# Upgrade DB schema and start app
+CMD ["sh", "-c", "flask db upgrade && waitress-serve --host=0.0.0.0 --port=8000 wsgi:app"]
