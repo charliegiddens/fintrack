@@ -1,8 +1,11 @@
 # Tech Stack
-Frontend: React
-Backend: Python (Flask)
-Cache: Redis
-Database: MySQL
+**Frontend:** React
+
+**Backend:** Python (Flask)
+
+**Cache: **Redis
+
+**Database:** MySQL
 
 # How to Run Locally
 1. Clone the repository
