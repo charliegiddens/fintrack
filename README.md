@@ -3,7 +3,7 @@
 
 **Backend:** Python (Flask)
 
-**Cache: **Redis
+**Cache:** Redis
 
 **Database:** MySQL
 
