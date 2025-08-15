@@ -1,7 +1,7 @@
 # Tech Stack
 **Frontend:** React
 
-**Backend:** Python (Flask)
+**Backend:** Python (Flask) + Auth0
 
 **Cache:** Redis
 
